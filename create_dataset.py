@@ -20,7 +20,7 @@ def emotion(x):
     }[x]       
 
 data = []
-for i in glob.glob("facesdb/**/bmp/*.bmp", recursive=True):
+for i in sorted(glob.glob("facesdb/**/bmp/*.bmp", recursive=True):
     data.append(plt.imread(i))
 
 data = np.stack(data)
