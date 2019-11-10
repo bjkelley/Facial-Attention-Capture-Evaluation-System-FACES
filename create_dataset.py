@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import scipy.misc
 from scipy import ndimage
+from image_mod_functions import rotate_image, add_gaussian_noise, add_salt_n_pepper
 
 class DataLoader:
     def __init__(self, datapath = ""):
@@ -24,6 +25,7 @@ class DataLoader:
         }[x]
 
     def getDataset(self):
+        # each entries of datset is a tuple of (image, label)
         datapath = os.path.join(self.datapath, "facesdb/**/bmp/*.bmp")
         data = []
         for i in glob.glob(datapath, recursive=True):
@@ -31,8 +33,8 @@ class DataLoader:
 
         data = np.stack(data)
         y = self.create_label_vector()
+        print(type(data))
         dataset = tf.data.Dataset.from_tensor_slices((data, y))
-
         return dataset
 
     def create_label_vector(self):
@@ -48,8 +50,10 @@ class DataLoader:
 dataLoader = DataLoader()
 dataset = dataLoader.getDataset()
 
-'''Debugging purpose
+'''Debugging purpose'''
 for img, label in dataset:
-    plt.imshow(img.numpy())
+    #img = add_salt_n_pepper(img)
+    img = add_gaussian_noise(img, 0, 0.2)
+    #img = rotate_image(img, 45)
+    plt.imshow(img)
     plt.show()
-'''
