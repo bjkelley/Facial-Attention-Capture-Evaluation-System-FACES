@@ -7,6 +7,7 @@ from scipy import ndimage
 from image_mod_functions import rotate_image, add_gaussian_noise, add_salt_n_pepper
 
 class DataLoader:
+<<<<<<< Updated upstream
     def __init__(self, datapath = ""):
         self.datapath = datapath
 
@@ -57,3 +58,37 @@ for img, label in dataset:
     #img = rotate_image(img, 45)
     plt.imshow(img)
     plt.show()
+=======
+    def __init__(self):
+        
+def emotion(x):
+    return {
+        0: 'neutral frontal',
+        1: 'joy',
+        2: 'sadness',
+        3: 'surprise',
+        4: 'anger',
+        5: 'disgust',
+        6: 'fear',
+        7: 'opened',
+        8: 'closed',
+        9: 'kiss'
+    }[x]       
+
+data = []
+for i in glob.glob("facesdb/**/bmp/*.bmp", recursive=True):
+    data.append(plt.imread(i))
+
+data = np.stack(data)
+
+# y is label vector
+y = []
+image = 0 
+for i in range(0,36):
+    for j in range(0,10):
+        y.append(emotion(j))
+
+dataset = tf.data.Dataset.from_tensor_slices((data, y))
+
+
+>>>>>>> Stashed changes
