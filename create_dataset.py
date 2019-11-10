@@ -4,10 +4,9 @@ import numpy as np
 import tensorflow as tf
 import scipy.misc
 from scipy import ndimage
-from image_mod_functions import rotate_image, add_gaussian_noise, add_salt_n_pepper
+from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray
 
 class DataLoader:
-<<<<<<< Updated upstream
     def __init__(self, datapath = ""):
         self.datapath = datapath
 
@@ -48,47 +47,16 @@ class DataLoader:
 
         return y
 
+'''Testing'''
+'''
 dataLoader = DataLoader()
 dataset = dataLoader.getDataset()
 
-'''Debugging purpose'''
 for img, label in dataset:
-    #img = add_salt_n_pepper(img)
+    img = rgb2gray(img)
+    img = add_speckle(img)
     img = add_gaussian_noise(img, 0, 0.2)
-    #img = rotate_image(img, 45)
-    plt.imshow(img)
+    img = rotate_image(img, 45)
+    plt.imshow(np.squeeze(img))
     plt.show()
-=======
-    def __init__(self):
-        
-def emotion(x):
-    return {
-        0: 'neutral frontal',
-        1: 'joy',
-        2: 'sadness',
-        3: 'surprise',
-        4: 'anger',
-        5: 'disgust',
-        6: 'fear',
-        7: 'opened',
-        8: 'closed',
-        9: 'kiss'
-    }[x]       
-
-data = []
-for i in glob.glob("facesdb/**/bmp/*.bmp", recursive=True):
-    data.append(plt.imread(i))
-
-data = np.stack(data)
-
-# y is label vector
-y = []
-image = 0 
-for i in range(0,36):
-    for j in range(0,10):
-        y.append(emotion(j))
-
-dataset = tf.data.Dataset.from_tensor_slices((data, y))
-
-
->>>>>>> Stashed changes
+'''
