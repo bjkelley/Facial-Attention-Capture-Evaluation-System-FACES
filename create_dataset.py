@@ -28,7 +28,7 @@ class DataLoader:
         # each entries of datset is a tuple of (image, label)
         datapath = os.path.join(self.datapath, "facesdb/**/bmp/*.bmp")
         data = []
-        for i in glob.glob(datapath, recursive=True):
+        for i in sorted(glob.glob(datapath, recursive=True)):
             data.append(plt.imread(i))
 
         data = np.stack(data)
