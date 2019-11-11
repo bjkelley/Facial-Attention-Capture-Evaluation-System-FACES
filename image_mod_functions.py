@@ -9,8 +9,6 @@ def rotate_image(image, degree):
     return ndimage.rotate(image, degree)
 
 def add_gaussian_noise(image, mean, var):
-    # mean = 0
-    # var = 0.2
     sigma = var**0.7
     gauss = np.random.normal(mean,sigma,image.shape)
     gauss = gauss.reshape(image.shape)
@@ -18,25 +16,40 @@ def add_gaussian_noise(image, mean, var):
 
     return noisy_image.numpy()
 
-def add_salt_n_pepper(image):
-    #row,col,ch = image.shape
-    s_vs_p = 0.5
-    amount = 0.004
-    out = np.copy(image)
-    # Salt mode
-    num_salt = np.ceil(amount * 1000 * s_vs_p)
-    coords = [np.random.randint(0, i - 1, int(num_salt))
-          for i in image.shape]
-    out[coords] = 1
+def rgb2gray(image):
+    grayscale2D = np.dot(image[...,:3], [0.2989, 0.5870, 0.1140])
+    return np.expand_dims(grayscale2D, axis=2)
 
-    # Pepper mode
-    num_pepper = np.ceil(amount* 1500 * (1. - s_vs_p))
-    coords = [np.random.randint(0, i - 1, int(num_pepper))
-          for i in image.shape]
-    out[coords] = 0
+def add_speckle(image):
+    row,col,ch = image.shape
+    gauss = np.random.randn(row,col,ch)
+    gauss = gauss.reshape(row,col,ch)
+    noisy_image = image + image * gauss
+    return noisy_image
 
-    return out
+def add_saltnpepper_noise(image):
+    out = np.zeros(image.shape)
+    # salt coordinates
+    coords = [np.random.randint(0,26,50), np.random.randint(0,26,50)]
 
+    # mask - 0 are regions where salt can be applied, otherwise don't touch
+    mask = np.zeros(out.shape)
+    mask[:13,:13] = 1
+    mask[-13:,-13:] = 2
+
+    # where does the salt coordinates land on the mask
+    a = mask[coords]
+
+    # find points where mask is 0
+    b = np.nonzero(a==0)
+
+    # copy from coords only where mask is 0
+    valid_coords = np.array(coords)[:,b]
+
+    # apply salt on valid coordinates
+    out = out.numpy()
+    out[valid_coords.tolist()]=1
+    
 def down_sample_image(image):
     im = tf.image.resize(image, size=[240,340], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR, antialias=True)
     image_downscaled = tf.dtypes.cast(im, dtype=tf.uint8)

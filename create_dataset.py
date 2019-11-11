@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 import scipy.misc
 from scipy import ndimage
-from image_mod_functions import rotate_image, add_gaussian_noise, add_salt_n_pepper, down_sample_image, up_sample_image
+from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray, down_sample_image, up_sample_image
 
 class DataLoader:
     def __init__(self, datapath = ""):
@@ -28,7 +28,7 @@ class DataLoader:
         # each entries of datset is a tuple of (image, label)
         datapath = os.path.join(self.datapath, "facesdb/**/bmp/*.bmp")
         data = []
-        for i in glob.glob(datapath, recursive=True):
+        for i in sorted(glob.glob(datapath, recursive=True)):
             data.append(plt.imread(i))
 
         data = np.stack(data)
@@ -47,15 +47,18 @@ class DataLoader:
 
         return y
 
+'''Testing'''
+'''
 dataLoader = DataLoader()
 dataset = dataLoader.getDataset()
 
-'''Debugging purpose'''
 for img, label in dataset:
-    # img = add_salt_n_pepper(img)
-    # img = add_gaussian_noise(img, 0, 0.2)
-    #img = rotate_image(img, 45)
     # img = down_sample_image(img)
     # img = up_sample_image(img)
-    plt.imshow(img)
+    img = rgb2gray(img)
+    img = add_speckle(img)
+    img = add_gaussian_noise(img, 0, 0.2)
+    img = rotate_image(img, 45)
+    plt.imshow(np.squeeze(img))
     plt.show()
+'''
