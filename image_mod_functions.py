@@ -2,6 +2,8 @@ from scipy import ndimage
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+# from skimage.transform import downscale_local_mean
+# from PIL import Image
 
 def rotate_image(image, degree):
     return ndimage.rotate(image, degree)
@@ -32,5 +34,15 @@ def add_salt_n_pepper(image):
     coords = [np.random.randint(0, i - 1, int(num_pepper))
           for i in image.shape]
     out[coords] = 0
-    
+
     return out
+
+def down_sample_image(image):
+    im = tf.image.resize(image, size=[240,340], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR, antialias=True)
+    image_downscaled = tf.dtypes.cast(im, dtype=tf.uint8)
+    return image_downscaled
+
+def up_sample_image(image):
+    im = tf.image.resize(image, size=[900,1200], method=tf.image.ResizeMethod.BICUBIC)
+    image_upscaled = tf.dtypes.cast(im, dtype=tf.uint8)
+    return image_upscaled
