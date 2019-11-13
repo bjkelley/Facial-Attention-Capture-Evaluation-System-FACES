@@ -30,4 +30,4 @@ or for windows:
 or for mac:
 
     virtualenv -p python3.7 venv
-    (Someone add this for me if we need it)
+    source venv/bin/activate
