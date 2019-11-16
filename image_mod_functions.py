@@ -12,7 +12,7 @@ def add_gaussian_noise(image, mean, var):
     gauss = gauss.reshape(image.shape)
     noisy_image = image + gauss
 
-    return noisy_image.numpy()
+    return noisy_image
 
 def rgb2gray(image):
     grayscale2D = np.dot(image[...,:3], [0.2989, 0.5870, 0.1140])
