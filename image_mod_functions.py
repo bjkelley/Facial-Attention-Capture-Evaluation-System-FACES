@@ -2,8 +2,6 @@ from scipy import ndimage
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-# from skimage.transform import downscale_local_mean
-# from PIL import Image
 
 def rotate_image(image, degree):
     return ndimage.rotate(image, degree)
@@ -27,29 +25,6 @@ def add_speckle(image):
     noisy_image = image + image * gauss
     return noisy_image
 
-def add_saltnpepper_noise(image):
-    out = np.zeros(image.shape)
-    # salt coordinates
-    coords = [np.random.randint(0,26,50), np.random.randint(0,26,50)]
-
-    # mask - 0 are regions where salt can be applied, otherwise don't touch
-    mask = np.zeros(out.shape)
-    mask[:13,:13] = 1
-    mask[-13:,-13:] = 2
-
-    # where does the salt coordinates land on the mask
-    a = mask[coords]
-
-    # find points where mask is 0
-    b = np.nonzero(a==0)
-
-    # copy from coords only where mask is 0
-    valid_coords = np.array(coords)[:,b]
-
-    # apply salt on valid coordinates
-    out = out.numpy()
-    out[valid_coords.tolist()]=1
-    
 def down_sample_image(image):
     im = tf.image.resize(image, size=[240,340], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR, antialias=True)
     image_downscaled = tf.dtypes.cast(im, dtype=tf.uint8)
