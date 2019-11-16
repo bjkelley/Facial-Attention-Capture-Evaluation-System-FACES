@@ -35,7 +35,7 @@ class DataLoader:
         y = self.create_label_vector()
         print(type(data))
         dataset = tf.data.Dataset.from_tensor_slices((data, y))
-        return dataset
+        return dataset, data, y
 
     def create_label_vector(self):
         # y is label vector
