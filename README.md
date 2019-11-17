@@ -1,9 +1,11 @@
 # ECS_171_ML_Measure_Attentiveness
 
 ## Dependencies
-* Python (3.7+?)
-* Numpy
-* Tensorflow (2.0+?)
+* Python 3.75+
+* Numpy 1.17.4
+* Scipy 1.3.2
+* Pillow 6.2.1
+* Tensorflow 2.0+
 * Virtualenv
 * etc
 
