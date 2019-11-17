@@ -3,7 +3,7 @@ from create_dataset import *
 import tensorflow.keras as keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization
-import import cv2 as cv2
+import cv2 as cv2
 
 # map emotion to onehot value
 # can do this in code if we want to, but just wrote this to be explicit
