@@ -1,0 +1,4 @@
+venv/
+checkpoints/
+plots/
+__pycache__/

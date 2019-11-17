@@ -12,16 +12,16 @@ class DataLoader:
 
     def get_emotion(self, x):
         return {
-            0: 'neutral frontal',
-            1: 'joy',
-            2: 'sadness',
-            3: 'surprise',
-            4: 'anger',
-            5: 'disgust',
-            6: 'fear',
-            7: 'opened',
-            8: 'closed',
-            9: 'kiss'
+            0: [1,0,0,0,0,0,0,0,0,0],#'neutral frontal',
+            1: [0,1,0,0,0,0,0,0,0,0],#'joy',
+            2: [0,0,1,0,0,0,0,0,0,0],#'sadness',
+            3: [0,0,0,1,0,0,0,0,0,0],#'surprise',
+            4: [0,0,0,0,1,0,0,0,0,0],#'anger',
+            5: [0,0,0,0,0,1,0,0,0,0],#'disgust',
+            6: [0,0,0,0,0,0,1,0,0,0],#'fear',
+            7: [0,0,0,0,0,0,0,1,0,0],#'opened',
+            8: [0,0,0,0,0,0,0,0,1,0],#'closed',
+            9: [0,0,0,0,0,0,0,0,0,1],#'kiss'
         }[x]
 
     def getDataset(self):
@@ -34,6 +34,7 @@ class DataLoader:
         data = np.stack(data)
         y = self.create_label_vector()
         print(type(data))
+        data = tf.cast(data, tf.float16)
         dataset = tf.data.Dataset.from_tensor_slices((data, y))
         return dataset
 
