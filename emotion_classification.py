@@ -8,6 +8,8 @@ import cv2 as cv2
 # map emotion to onehot value
 # can do this in code if we want to, but just wrote this to be explicit
 
+HEIGHT = WIDTH = 50
+
 emotion_to_onehot = {
     'neutral frontal': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     'joy':             [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -56,7 +58,9 @@ def apply_transformations(img):
     # add gaussian noise, random rotation, and scale to 100x100
     img = add_gaussian_noise(img, 0, 0.2)
     img = rotate_image( img, np.random.randint(-10, 10) )
-    img = standardize_image(img)
+    img = standardize_image(img, HEIGHT, WIDTH)
+    
+
     
     return img
 
@@ -64,17 +68,25 @@ def apply_transformations(img):
 dataLoader = DataLoader()
 dataset, data, labels = dataLoader.getDataset()
 
+final_data = data
+final_labels = labels
+# upsample dataset from 360 -> 1080n
+
+for i in range(2):
+    final_data = np.append(final_data, data, axis=0)
+    final_labels = np.append(final_labels, labels, axis=0)
+
 ## format X array
-X_transformed = np.array([ np.array(apply_transformations(img)).reshape(200,200,1) 
-                          for img in data])
+X_transformed = np.array([ np.array(apply_transformations(img)).reshape(HEIGHT,WIDTH,1) 
+                          for img in final_data])
 
 ## format lables to be one-hot-encoded
-onehot_lables = [emotion_to_onehot[emotion] for emotion in labels]
+onehot_lables = [emotion_to_onehot[emotion] for emotion in final_labels]
 one_hot_Y = np.array(onehot_lables)
 
 print("shape of X_transformed: ", X_transformed.shape)
 print("shape of one_hot_Y: ", one_hot_Y.shape)
-
+'''
 #create model
 model = Sequential([
     Conv2D(64, kernel_size=(8,8), activation='relu', input_shape=(200,200,1), 
@@ -95,9 +107,39 @@ model = Sequential([
     Dropout(0.2),
     Dense(10, activation='softmax')
 ])
+'''
+# Final Model Architecture:
+from tensorflow.keras import layers
+from tensorflow.keras import models
+from tensorflow.keras import optimizers
 
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+modelN = models.Sequential()
+modelN.add(layers.Conv2D(32, (3, 3), padding='same', activation='relu',
+                            input_shape=(HEIGHT, WIDTH, 1)))
+modelN.add(layers.Conv2D(32, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.Conv2D(32, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.MaxPooling2D(pool_size=(2, 2)))
+modelN.add(layers.Dropout(0.2))
 
-model.fit(X_transformed, one_hot_Y, 
-          epochs=10, batch_size=200, validation_split=0.20)
+modelN.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.Conv2D(64, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.MaxPooling2D(pool_size=(2, 2)))
+modelN.add(layers.Dropout(0.2))
+
+modelN.add(layers.Conv2D(128, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.Conv2D(128, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.Conv2D(128, (3, 3), padding='same', activation='relu'))
+modelN.add(layers.MaxPooling2D(pool_size=(2, 2)))
+modelN.add(layers.Dropout(0.2))
+
+modelN.add(layers.Flatten())  # this converts our 3D feature maps to 1D feature vectors
+modelN.add(layers.Dense(64, activation='relu'))
+modelN.add(layers.Dense(64, activation='relu'))
+modelN.add(layers.Dense(10, activation='softmax'))
+
+modelN.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+modelN.fit(X_transformed, one_hot_Y, 
+          epochs=120, batch_size=200, validation_split=0.20)
 

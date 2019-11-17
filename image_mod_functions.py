@@ -30,8 +30,8 @@ def down_sample_image(image):
     image_downscaled = tf.dtypes.cast(im, dtype=tf.uint8)
     return image_downscaled
 
-def standardize_image(image):
-    im = tf.image.resize(image, size=[200,200], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR, antialias=True)
+def standardize_image(image, height, width):
+    im = tf.image.resize(image, size=[height, width], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR, antialias=True)
     image_downscaled = tf.dtypes.cast(im, dtype=tf.uint8)
     return image_downscaled
 
