@@ -65,7 +65,7 @@ dataLoader = DataLoader()
 dataset, data, labels = dataLoader.getDataset()
 
 ## format X array
-X_transformed = np.array([ np.array(apply_transformations(img)).reshape(240,340,1) 
+X_transformed = np.array([ np.array(apply_transformations(img)).reshape(200,200,1) 
                           for img in data])
 
 ## format lables to be one-hot-encoded
@@ -77,7 +77,7 @@ print("shape of one_hot_Y: ", one_hot_Y.shape)
 
 #create model
 model = Sequential([
-    Conv2D(64, kernel_size=(8,8), activation='relu', input_shape=(240,340,1), 
+    Conv2D(64, kernel_size=(8,8), activation='relu', input_shape=(200,200,1), 
            kernel_regularizer=keras.regularizers.l2(0.01)),
     #Conv2D(64, kernel_size=(8, 8), activation='relu'),
     BatchNormalization(),

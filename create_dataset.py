@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 import scipy.misc
 from scipy import ndimage
-from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray, down_sample_image, up_sample_image
+from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray, down_sample_image, up_sample_image, standardize_image
 
 class DataLoader:
     def __init__(self, datapath = ""):
