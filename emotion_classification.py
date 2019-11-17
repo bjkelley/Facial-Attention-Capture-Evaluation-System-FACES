@@ -3,7 +3,7 @@ from create_dataset import *
 import tensorflow.keras as keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, MaxPooling2D, Dropout, BatchNormalization
-
+import import cv2 as cv2
 
 # map emotion to onehot value
 # can do this in code if we want to, but just wrote this to be explicit
@@ -38,10 +38,25 @@ def apply_transformations(img):
     
     output: transformed image
     '''
-    img = rgb2gray(img)
+    
+    # Load the cascade
+    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    
+    # Convert into grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # Detect faces, extract them
+    faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+    x, y, w, h = faces[0]
+    img = gray[y:y+h, x:x+w]
+    
+    # reshape so that there's 1 channel
+    img = img.reshape(h, w, 1)
+    
+    # add gaussian noise, random rotation, and scale to 100x100
     img = add_gaussian_noise(img, 0, 0.2)
     img = rotate_image( img, np.random.randint(-10, 10) )
-    img = down_sample_image(img)
+    img = standardize_image(img)
     
     return img
 
