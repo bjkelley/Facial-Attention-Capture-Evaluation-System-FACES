@@ -3,6 +3,8 @@ from create_dataset import *
 import tensorflow.keras as keras
 from tensorflow.keras.models import Sequential
 import cv2 as cv2
+import matplotlib
+import matplotlib.pyplot as plt
 
 from tensorflow.keras import layers
 from tensorflow.keras import models
@@ -15,7 +17,7 @@ warnings.filterwarnings("ignore")
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 # pixel height/width for resizing images
-HEIGHT = WIDTH = 50
+HEIGHT = WIDTH = 60
 
 emotion_to_onehot = {
     'neutral frontal': [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -153,10 +155,43 @@ def get_CNN_model():
 
     return model
 
+def generate_and_save_figures(history):
+    # accuracy
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('Train/test accuracy over training')
+    plt.ylabel('accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.savefig('figures/train_vs_test_accuracy.png')
+    plt.cla()
+
+    # top3 accuracy
+    plt.plot(history.history['top3_acc'])
+    plt.plot(history.history['val_top3_acc'])
+    plt.title('Train/test top3 accuracy over training')
+    plt.ylabel('top3 accuracy')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.savefig('figures/train_vs_test_top3_accuracy.png')
+    plt.cla()
+
+    # loss 
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Train/test loss over training')
+    plt.ylabel('loss')
+    plt.xlabel('epoch')
+    plt.legend(['train', 'validation'], loc='upper left')
+    plt.savefig('figures/train_vs_test_loss.png')
+    plt.cla()
+
+
+
 def main():
 
     # get train/test data
-    train_X, train_Y, test_X, test_Y = get_train_test_data()
+    train_X, train_Y, test_X, test_Y = get_train_test_data(oversample_amt=4)
 
     # trainsform sets
     train_X, train_Y = transform_data(train_X, train_Y)
@@ -177,11 +212,17 @@ def main():
     top3_acc.__name__ = 'top3_acc'
    
     # compile model
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy', top3_acc])
+    model.compile(optimizer='adam', 
+                  loss='categorical_crossentropy', 
+                  metrics=['accuracy', top3_acc])
 
     # run on dataset
-    model.fit(train_X, train_Y, 
-                        epochs=40, batch_size=200, validation_data=(test_X,test_Y))
+    history = model.fit(train_X, train_Y, 
+                        epochs=20, batch_size=200, 
+                        validation_data=(test_X,test_Y))
+
+    # save figures into figures/ directory
+    generate_and_save_figures(history)
 
 
 main()
