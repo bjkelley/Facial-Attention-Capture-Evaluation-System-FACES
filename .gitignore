@@ -2,3 +2,4 @@ venv/
 checkpoints/
 plots/
 __pycache__/
+haarcascade_frontalface_default.xml
