@@ -152,6 +152,15 @@ def get_CNN_model():
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(64, activation='relu'))
     model.add(layers.Dense(10, activation='softmax'))
+   
+   # define custom top3 accuracy metric
+    top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
+    top3_acc.__name__ = 'top3_acc'
+   
+    # compile model
+    model.compile(optimizer='adam', 
+                  loss='categorical_crossentropy', 
+                  metrics=['accuracy', top3_acc])
 
     return model
 
@@ -207,22 +216,15 @@ def main():
     # get model
     model = get_CNN_model()
 
-    # define custom top3 accuracy metric
-    top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
-    top3_acc.__name__ = 'top3_acc'
-   
-    # compile model
-    model.compile(optimizer='adam', 
-                  loss='categorical_crossentropy', 
-                  metrics=['accuracy', top3_acc])
-
     # run on dataset
     history = model.fit(train_X, train_Y, 
                         epochs=20, batch_size=200, 
                         validation_data=(test_X,test_Y))
 
     # save figures into figures/ directory
-    generate_and_save_figures(history)
+    #generate_and_save_figures(history)
+
+    #model.save('trained_models/cnn.h5')
 
 
 main()
