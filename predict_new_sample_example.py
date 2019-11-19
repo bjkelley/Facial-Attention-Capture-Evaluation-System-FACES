@@ -26,4 +26,3 @@ top_class, top_k_classes, top_k_probs = myLoader.classify(image, k_most_confiden
 print(f"true class: {y_true}")
 print(f"predicted class: {top_class}")
 print(f"predicted top 3 classes (sorted): {top_k_classes}")
-print(f"predicted top 3 classes probs (sorted): {top_k_probs}")

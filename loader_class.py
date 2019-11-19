@@ -1,26 +1,14 @@
-from create_dataset import *
-
 import tensorflow.keras as keras
-from tensorflow.keras.models import Sequential
 import cv2 as cv2
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
-
-from tensorflow.keras import backend as K
 import functools as functools
-import warnings
 
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
 from image_mod_functions import standardize_image
 
 # define custom metric, needed as a dependency in keras.models.load_model
 top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
 top3_acc.__name__ = 'top3_acc'
 dependencies = {'top3_acc' : top3_acc}
-
 
 class LoadModel():
     '''
@@ -76,10 +64,14 @@ class LoadModel():
         # Detect faces, extract them
         faces = self.face_cascade.detectMultiScale(gray, 1.1, 4)
         x, y, w, h = faces[0]
-        img = gray[y:y+h, x:x+w]
-
-        # reshape so that there's 1 channel
-        img = img.reshape(h, w, 1)
+     
+        # reshape so that there's self.input_shape[2] channels if necessary
+        if (self.input_shape[2] != 1):
+            img = img[y:y+h, x:x+h, :]
+        
+        # else, use grayscale
+        else:
+            img = gray[y:y+h, x:x+w].reshape(h, w, 1)
 
         # scale image to input_shape width x height
         img = standardize_image(img, self.input_shape[0], self.input_shape[1])
