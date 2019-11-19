@@ -189,7 +189,7 @@ def generate_and_save_figures(history):
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig('figures/train_vs_test_accuracy.png')
+    plt.savefig('figures/train_vs_test_accuracy_cnn3.png')
     plt.cla()
 
     # top3 accuracy
@@ -199,7 +199,7 @@ def generate_and_save_figures(history):
     plt.ylabel('top3 accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig('figures/train_vs_test_top3_accuracy.png')
+    plt.savefig('figures/train_vs_test_top3_accuracy_cnn3.png')
     plt.cla()
 
     # loss 
@@ -209,7 +209,7 @@ def generate_and_save_figures(history):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'validation'], loc='upper left')
-    plt.savefig('figures/train_vs_test_loss.png')
+    plt.savefig('figures/train_vs_test_loss_cnn3.png')
     plt.cla()
 
 
@@ -217,7 +217,7 @@ def generate_and_save_figures(history):
 def main():
 
     # get train/test data
-    train_X, train_Y, test_X, test_Y = get_train_test_data(oversample_amt=4)
+    train_X, train_Y, test_X, test_Y = get_train_test_data(oversample_amt=0)
 
     # trainsform sets
     train_X, train_Y = transform_data(train_X, train_Y)
@@ -236,13 +236,13 @@ def main():
 
     # run on dataset
     history = model.fit(train_X, train_Y, 
-                        epochs=25, batch_size=200, 
+                        epochs=2, batch_size=200, 
                         validation_data=(test_X,test_Y))
 
     # save figures into figures/ directory
-    #generate_and_save_figures(history)
+    generate_and_save_figures(history)
 
-    #model.save('trained_models/cnn2.h5')
+    model.save('trained_models/cnn3.h5')
 
 
 main()
