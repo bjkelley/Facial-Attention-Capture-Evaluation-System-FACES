@@ -24,6 +24,16 @@ blurb about most prominent functions to use
 
 - this module trains and outputs a keras model (weights, optimizer state, and architecture), as well as provides evaluation plots (loss, accuracy, and top3 accuracy for train/test splits).
 
+- the general steps of this data pipeline are as follows:
+    1) load in the image dataset with Dataloader()
+        - modified the class to return a tensorflow dataset, as well as numpy array of features and labels
+        - also included a standardize_image() function to be able to downsize an image
+    2) preprocess the images by appling several transformations
+        - **in apply_transformations()**:
+            - use OpenCV to detect and crop face in the image (the images from the dataset weren't fully cropped)
+            - change to grayscale (done in the OpenCV face detection step)
+            - use downsize all images (used 60x60 pixels)
+
 
 ## Installation
 **Fill this out as you create modules** to let everyone know how to setup important directories and how to download the right files for use.
