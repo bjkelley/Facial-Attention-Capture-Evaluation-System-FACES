@@ -1,18 +1,29 @@
 # ECS_171_ML_Measure_Attentiveness
 
 ## Dependencies
-* Python (3.7+?)
-* Numpy
-* Tensorflow (2.0+?)
+* Python 3.75+
+* Numpy 1.17.4
+* Scipy 1.3.2
+* Pillow 6.2.1
+* Tensorflow 2.0+
+* opencv-python (4.1.1.26) 
 * Virtualenv
+* matplotlib
 * etc
 
 ## Modules
 
 ### create_dataset.py
 blurb about most prominent functions to use
+
 ### image_mod_functions
 blurb about most prominent functions to use
+
+### emotion_classification.py
+
+
+- this module trains and outputs a keras model (weights, optimizer state, and architecture), as well as provides evaluation plots (loss, accuracy, and top3 accuracy for train/test splits).
+
 
 ## Installation
 **Fill this out as you create modules** to let everyone know how to setup important directories and how to download the right files for use.
