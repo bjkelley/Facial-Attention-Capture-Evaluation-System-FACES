@@ -19,7 +19,7 @@ blurb about most prominent functions to use
 ### image_mod_functions
 blurb about most prominent functions to use
 
-### 🙈how to actually use the CNN classifier (for live demo stuff)🙈:
+### how to actually use the CNN classifier (for live demo stuff):
 - to actually use the classifier for working on the live demo part, **predict_new_sample_example.py** is really helpful. you basically need to load the CNN classifer with the custom class **LoadModel**, read in the image, call ```image = LoadModel.preprocess(image)``` (, then call ```pred, top3_preds, top3_probs = LoadModel.classify(image)```. It might be noteworthy that ```LoadModel.preprocess()``` actually does facial detection/cropping with OpenCV, converts the image to grayscale, and resizes to the correct pixel amount needed (60x60 for the most accurate CNN model, 'cnn2').
 - **output of LoadModel.classify(image)**
     - a tuple of 3 elements:
@@ -40,11 +40,11 @@ blurb about most prominent functions to use
         - also included a one-hot-encoding map to map the emotion strings to one-hot arrays, and have a reverse lookup dictionary as well
     2) **preprocess the images with apply_transformations():**
         - use OpenCV to detect and crop face in the image (the images from the dataset weren't fully cropped)
-        - change to grayscale (done in the OpenCV face detection step😛)
+        - change to grayscale (done in the OpenCV face detection step)
         - downsize all images (used 60x60 pixels) for input to a convolutional neural network
         - apply rest of transformations (add gaussian noise, random rotation)
     3) **create training/testing split, and bootstrap dataset:
-        - our data set only had 36 unique faces (😥), and 10 emotions per each face, so 360 faces total. to create an accurate training pipeline, we split up the training data to have 28 of the faces (280 images), then bootstrapped this training set by applying image augmentations 4 more times, resulting in 1,400 images in the training set. the validation set had 80 images, and none of the people in the testing set were present in the training set. 
+        - our data set only had 36 unique faces, and 10 emotions per each face, so 360 faces total. to create an accurate training pipeline, we split up the training data to have 28 of the faces (280 images), then bootstrapped this training set by applying image augmentations 4 more times, resulting in 1,400 images in the training set. the validation set had 80 images, and none of the people in the testing set were present in the training set. 
         - this decreased accuracy in our validation pipeline, but helps us generalize our model to new people
     4) **train convolutional neural network:**
         - using tensorflow's keras API, we trained a CNN (also tried numerous SVM models) over epochs and kept track of the following metrics over the training epochs:
