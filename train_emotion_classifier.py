@@ -117,22 +117,22 @@ def transform_data(X, Y):
     return X_transformed, one_hot_Y
 
 def fastSVM(input_shape=(HEIGHT,WIDTH, 1)):
-	model = keras.Sequential()
-	model.add(layers.Conv2D(filters=16, kernel_size=(4,4), strides=1,
-		padding='same', activation="relu", input_shape=input_shape))
-	model.add(layers.Conv2D(filters=16, kernel_size=(4,4), strides=2, padding='same', activation="relu"))	
-	model.add(layers.Conv2D(filters=24, kernel_size=(2,2), strides=2, padding='same', activation="relu"))	
-	model.add(layers.Conv2D(filters=32, kernel_size=(2,2), strides=2, padding='same', activation="relu"))	
-	model.add(layers.Flatten())
-	model.add(layers.Dense(10, kernel_regularizer=keras.regularizers.l2(0.01)))
-	model.add(layers.Activation('softmax'))
+    model = keras.Sequential()
+    model.add(layers.Conv2D(filters=16, kernel_size=(4,4), strides=1,
+        padding='same', activation="relu", input_shape=input_shape))
+    model.add(layers.Conv2D(filters=16, kernel_size=(4,4), strides=2, padding='same', activation="relu"))	
+    model.add(layers.Conv2D(filters=24, kernel_size=(2,2), strides=2, padding='same', activation="relu"))	
+    model.add(layers.Conv2D(filters=32, kernel_size=(2,2), strides=2, padding='same', activation="relu"))	
+    model.add(layers.Flatten())
+    model.add(layers.Dense(10, kernel_regularizer=keras.regularizers.l2(0.01)))
+    model.add(layers.Activation('softmax'))
 
-	top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
-	top3_acc.__name__ = "top3_acc"
-	model.compile(loss='squared_hinge',
-	              optimizer='adam',
-	              metrics=['accuracy', top3_acc])
-	return model
+    top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
+    top3_acc.__name__ = "top3_acc"
+    model.compile(loss='squared_hinge',
+                  optimizer='adam',
+                  metrics=['accuracy', top3_acc])
+    return model
 
 def get_CNN_model():
     model = models.Sequential()
@@ -222,7 +222,7 @@ def main():
 
     # get model
     model = get_CNN_model()
-    model = fastSVM()
+    #model = fastSVM()
 
     # run on dataset
     history = model.fit(train_X, train_Y, 
