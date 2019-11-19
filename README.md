@@ -55,13 +55,10 @@ blurb about most prominent functions to use
         - saved model into models/ directory, using **model.save(*path*)**
         - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture. 
         
-     7) **using the trained CNN to predict the emotion of a new sample:**
-        - to predict the emotion of a new image sample, we'll need to do some preprocessing to the image before we can input it into the model. this includes:
-            - detecting the face with OpenCV, and cropping this area
-            - converting to grayscale (done in above step)
-            - resizing to 60x60 for CNN (exact input shape required in 60,60,1)
-            - model.predict() to get list of probabilities
-        
+### loader_class.py
+- this class loads in a specified, pretrained model. by default, loads in the CNN2, trained with 60x60 grayscale face inputs.
+- this class **preprocesses** and **classifies**. the classification returns a tuple of 3 elements: the most confident emotion string prediction, the top k (3 by default) most confident emotion string predictions, and the corresponding top k (3 by default) most confident emotion string predictions.
+       
 
 
 ## Installation
