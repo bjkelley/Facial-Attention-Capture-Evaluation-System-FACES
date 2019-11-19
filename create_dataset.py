@@ -46,15 +46,15 @@ class DataLoader:
         face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         for i in sorted(glob.glob(datapath, recursive=True)):
             image = plt.imread(i)
-            print(type(image))
-            print(image.dtype)
+            # print(type(image))
+            # print(image.dtype)
             gray = cv2.cvtColor(image[0:-40,:,:], cv2.COLOR_BGR2GRAY)
             faces = face_cascade.detectMultiScale(gray, 1.1,4)
             x, y, w, h = faces[0]
             image = image[y:y+h,x:x+w,:]
-            plt.imshow(image)
-            plt.title(i)
-            plt.show()
+            # plt.imshow(image)
+            # plt.title(i)
+            # plt.show()
             image = tf.cast(standardize_image(image, 128, 128), tf.float32) / 255.0 #normalize to float on [0, 1]
             data.append(image)
 
