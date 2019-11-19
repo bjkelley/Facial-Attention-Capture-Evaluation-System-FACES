@@ -19,8 +19,12 @@ blurb about most prominent functions to use
 ### image_mod_functions
 blurb about most prominent functions to use
 
-### emotion_classification.py
+### 🙈how to actually use the CNN classifier (for live demo stuff)🙈:
+- to actually use the classifier for working on the live demo part, **predict_new_sample_example.py** is really helpful. you basically need to load the CNN classifer with the custom class **LoadModel**, read in the image as a numpy array (with shape HEIGHT x WIDTH x 3), call ```image = LoadModel.preprocess(image)```, then call ```pred, top3_preds, top3_probs = LoadModel.classify(image)```. it's pretty helpful to open a jupyter notebook, paste all the code in **predict_new_sample_example.py** into a cell, and then looking at the output.
 
+- i'm assuming for the live demo, we will be extracting each frame and classifying the emotion in that frame. we should probably do a very low frame rate (maybe like 3 per second?) and make sure that in the live demo we hold the emotions for a second lol. 
+
+### train_emotion_classifier.py
 
 - this module trains and outputs a keras model (weights, optimizer state, and architecture), as well as provides evaluation plots (loss, accuracy, and top3 accuracy for train/test splits).
 
@@ -50,7 +54,7 @@ blurb about most prominent functions to use
         - saved model into models/ directory, using **model.save(*path*)**
         - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture. 
         
-     7) **using the trained CNN to predict the emotion of a new sample):**
+     7) **using the trained CNN to predict the emotion of a new sample:**
         - to predict the emotion of a new image sample, we'll need to do some preprocessing to the image before we can input it into the model. this includes:
             - detecting the face with OpenCV, and cropping this area
             - converting to grayscale (done in above step)
