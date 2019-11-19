@@ -32,16 +32,6 @@ emotion_to_onehot = {
     'kiss':            [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 }
 
-# reverse dictionary to be able to get predicted label
-onehot_to_emotion = {str(onehot_value): emotion for emotion, onehot_value in emotion_to_onehot.items()}
-
-def get_pred_emotion(one_hot_output):
-    '''
-    takes in one hot predicted label, outputs the emotion string
-    '''
-    return onehot_to_emotion[str(one_hot_output)]
-
-
 def apply_transformations(img):
     '''
     input: img matrix of a single image
