@@ -218,13 +218,13 @@ def main():
 
     # run on dataset
     history = model.fit(train_X, train_Y, 
-                        epochs=20, batch_size=200, 
+                        epochs=25, batch_size=200, 
                         validation_data=(test_X,test_Y))
 
     # save figures into figures/ directory
-    #generate_and_save_figures(history)
+    generate_and_save_figures(history)
 
-    #model.save('trained_models/cnn.h5')
+    model.save('trained_models/cnn2.h5')
 
 
 main()
