@@ -25,14 +25,38 @@ blurb about most prominent functions to use
 - this module trains and outputs a keras model (weights, optimizer state, and architecture), as well as provides evaluation plots (loss, accuracy, and top3 accuracy for train/test splits).
 
 - the general steps of this data pipeline are as follows:
-    1) load in the image dataset with Dataloader()
+    1) **load in the image dataset with Dataloader():**
         - modified the class to return a tensorflow dataset, as well as numpy array of features and labels
         - also included a standardize_image() function to be able to downsize an image
-    2) preprocess the images by appling several transformations
-        - **in apply_transformations()**:
-            - use OpenCV to detect and crop face in the image (the images from the dataset weren't fully cropped)
-            - change to grayscale (done in the OpenCV face detection step)
-            - use downsize all images (used 60x60 pixels)
+        - also included a one-hot-encoding map to map the emotion strings to one-hot arrays, and have a reverse lookup dictionary as well
+    2) **preprocess the images with apply_transformations():**
+        - use OpenCV to detect and crop face in the image (the images from the dataset weren't fully cropped)
+        - change to grayscale (done in the OpenCV face detection step😛)
+        - downsize all images (used 60x60 pixels) for input to a convolutional neural network
+        - apply rest of transformations (add gaussian noise, random rotation)
+    3) **create training/testing split, and bootstrap dataset:
+        - our data set only had 36 unique faces (😥), and 10 emotions per each face, so 360 faces total. to create an accurate training pipeline, we split up the training data to have 28 of the faces (280 images), then bootstrapped this training set by applying image augmentations 4 more times, resulting in 1,400 images in the training set. the validation set had 80 images, and none of the people in the testing set were present in the training set. 
+        - this decreased accuracy in our validation pipeline, but helps us generalize our model to new people
+    4) **train convolutional neural network:**
+        - using tensorflow's keras API, we trained a CNN (also tried numerous SVM models) over epochs and kept track of the following metrics over the training epochs:
+            - **train/test accuracy**
+            - **train/test top3 accuracy** (proportion of predictions where true label is in the top 3 predicted classes with highest probability)
+            - **train/test loss**
+     5) **plotting evaluation figures:**
+        - evaluation figures can be found in figures/ directory
+        - model CNN2 performed best (as of now) and should be used for further testing
+        
+     6) **saving tensorflow.keras model):**
+        - saved model into models/ directory, using **model.save(*path*)**
+        - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture. 
+        
+     7) **using the trained CNN to predict the emotion of a new sample):**
+        - to predict the emotion of a new image sample, we'll need to do some preprocessing to the image before we can input it into the model. this includes:
+            - detecting the face with OpenCV, and cropping this area
+            - converting to grayscale (done in above step)
+            - resizing to 60x60 for CNN (exact input shape required in 60,60,1)
+            - model.predict() to get list of probabilities
+        
 
 
 ## Installation
