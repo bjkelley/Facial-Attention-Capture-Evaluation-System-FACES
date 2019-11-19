@@ -9,14 +9,14 @@ myLoader = LoadModel(model_type='cnn2', input_shape=(60,60,1))
 image = plt.imread('facesdb/s003/bmp/s003-00_img.bmp')
 y_true = 'neutral frontal'
 
-plt.imshow(np.squeeze(image))
+plt.imshow(np.squeeze(image), cmap='gray')
 plt.title('raw image')
 plt.show() 
 
 # do enough preprocessing for model input(facial detection, grayscale, pixel resizing)
 image = myLoader.preprocess(image)
 
-plt.imshow(np.squeeze(image))
+plt.imshow(np.squeeze(image), cmap='gray')
 plt.title('after preprocessing')
 plt.show() 
 
