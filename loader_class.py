@@ -5,6 +5,7 @@ from tensorflow.keras.models import Sequential
 import cv2 as cv2
 import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
 from tensorflow.keras import backend as K
 import functools as functools
@@ -20,36 +21,36 @@ top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
 top3_acc.__name__ = 'top3_acc'
 dependencies = {'top3_acc' : top3_acc}
 
-new_model = 
 
 class LoadModel():
-	"""doc"""
+	'''
+	LoadModel: class to load pretrained image emotion classifier
+
+	contains functions to:
+		- return predicted emotion string
+		- preprocess an image to get it ready for classifiaction
+		- return top prediction and/or top3 predictions
+	'''
 	def __init__(self, model_type="cnn2", input_shape=(60,60, 1)):
-		model_type = model_type.lower()
-		if model_type == "generalizedsvm":
-			self.model = tf.keras.models.load_model('generalizedSVM.h5')
-		elif model_type == "fastsvm":
-			self.model = tf.keras.models.load_model('fastSVM.h5')
-		elif model_type == "cnn2"
+		# initialize object attributes
+		self.model_type = model_type.lower()
+		self.input_shape = input_shape
+
+		# load OpenCV face detection cascade for preprocessing steps
+	    self.face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+
+		# load in correct model
+		if self.model_type == "cnn2"
 			self.model = keras.models.load_model('trained_models/cnn2.h5', custom_objects=dependencies)
+		elif self.model_type == "cnn1":
+			self.model = keras.models.load_model('trained_models/cnn2.h5', custom_objects=dependencies)
+		elif self.model_type == "fastsvm":
+			self.model = keras.models.load_model('trained_models/fastsvm.h5', custom_objects=dependencies)
 		else:
 			raise Exception(f"Model type {model_type} not found. Try another model.")
 
-	def max_list(result, num_classes=3):
-		maxList = []
-		for index, probability in enumerate(result):
-			if len(MaxList) == 0: # first iteration
-				maxList.append((probability, index))
-				continue
-			#iterate through sorted subset of result
-			for rank, element in enumerate(maxList):
-				if probability > element:
-					maxList.insert((probability, index), rank)
-			if len(maxList) > num_classes: #keeps only top num_classes in result
-				maxList.pop()
-		return maxList
-
-	def get_emotion(x):
+	def get_emotion(one_hot_idx):
+		'''returns emotion string that corresponds to the one-hot-encoded index'''
 		return {
 			0: 'neutral frontal',
 			1: 'joy',
@@ -61,15 +62,54 @@ class LoadModel():
 			7: 'opened',
 			8: 'closed',
 			9: 'kiss'
-		}[x]
+		}[one_hot_idx]
 
-	def classify(input):
-		classes = []
-		if len(input.shape) == 4: #handle batch prediction
-			result = model.predict(input)
-			for prediction in result:
-				classes.append(TopThree(prediction))
-		elif len(input_shape) == 3: #handle single prediction
-			result = model.predict((input)) 
-			classes.append(TopThree(result))
-		return classes
+	def preprocess(img):
+		'''preprocesses image accordingly so that model can take it as input
+		- use OpenCV face detector and convert to grayscale
+		- resize image
+		'''
+
+	    # Convert into grayscale
+	    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	    
+	    # Detect faces, extract them
+	    faces = self.face_cascade.detectMultiScale(gray, 1.1, 4)
+	    x, y, w, h = faces[0]
+	    img = gray[y:y+h, x:x+w]
+	    
+	    # reshape so that there's 1 channel
+	    img = img.reshape(h, w, 1)
+	    
+	    # scale image to input_shape width x height
+	    img = standardize_image(img, self.input_shape[0], self.input_shape[1])
+
+	    return img
+	   
+
+	def classify(img, k_most_confident_classes=3):
+		'''takes in img
+		returns: 
+			- predicted class string
+			- top k (3 by default) most confident emotion string predictions
+			- the corresponding k (3 by default) emotion probailities
+		'''
+		
+		# do preprocessing (facial detection, grayscale, pixel resizing)
+		img = preprocess(img)
+
+		# plug into model to get array of probabilities
+		probs = self.model.predict_proba(img)
+
+		# sort probability indices from highest to lowest probabilitiy
+		sorted_indices = np.argsort(probs)[::-1]
+
+		# get sorted emotions
+		sorted_emotions = [get_emotion(idx) for idx in sorted_indices]
+
+		# get sorted probabilities
+		sorted_probabilities = [probs[idx] for idx in sorted_indices]
+
+		return sorted_emotions[0], 
+			   sorted_emotions[:k_most_confident_classes],
+			   sorted_probabilities[:k_most_confident_classes]
