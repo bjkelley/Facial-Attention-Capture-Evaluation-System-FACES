@@ -101,8 +101,8 @@ def generalizedSVM(input_shape=(128,128, 3)):
 	return model
 
 dataLoader = create_dataset.DataLoader()
-trainSet = dataLoader.getDataset(num_samples=300)[0] #gives first 30 subjects
-testSet = dataLoader.getDataset(start_index=300)[0] #gives last 6 subjects
+trainSet = dataLoader.getDataset(num_samples=300, normalize=True)[0] #gives first 30 subjects
+testSet = dataLoader.getDataset(start_index=300, normalize=True)[0] #gives last 6 subjects
 testSet = testSet.batch(10)
 
 #Apply transformations to expand dataset

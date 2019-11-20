@@ -39,7 +39,7 @@ class DataLoader:
             9: [0,0,0,0,0,0,0,0,0,1],#'kiss'
         }[x]
 
-    def getDataset(self, start_index=0, num_samples=None):
+    def getDataset(self, start_index=0, num_samples=None, normalize=False):
         # each entries of datset is a tuple of (image, label)
         datapath = os.path.join(self.datapath, "facesdb/**/bmp/*.bmp")
         data = []
@@ -54,7 +54,9 @@ class DataLoader:
                 x, y, w, h = faces[0]
                 image = image[y:y+h,x:x+w,:]
                 #normalize to float on [0, 1]
-                image = tf.cast(standardize_image(image, 128, 128), tf.float32) / 255.0
+                image = tf.cast(standardize_image(image, 128, 128), tf.float32)
+                if normalize == True:
+                    image = image / 255.0
                 data.append(image)
         data = np.stack(data)
         y = self.create_label_vector()
