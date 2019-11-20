@@ -5,7 +5,7 @@ import tensorflow as tf
 import scipy.misc
 from scipy import ndimage
 import cv2
-from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray, standardize_image
+from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray, down_sample_image, up_sample_image, standardize_image
 
 class DataLoader:
     def __init__(self, datapath = ""):
@@ -54,7 +54,7 @@ class DataLoader:
                 x, y, w, h = faces[0]
                 image = image[y:y+h,x:x+w,:]
                 #normalize to float on [0, 1]
-                image = tf.cast(standardize_image(image, 128, 128), tf.float32)
+                image = standardize_image(image, 128, 128)
                 if normalize == True:
                     image = image / 255.0
                 data.append(image)
@@ -80,6 +80,8 @@ dataLoader = DataLoader()
 dataset = dataLoader.getDataset()
 
 for img, label in dataset:
+    # img = down_sample_image(img)
+    # img = up_sample_image(img)
     img = rgb2gray(img)
     img = add_speckle(img)
     img = add_gaussian_noise(img, 0, 0.2)

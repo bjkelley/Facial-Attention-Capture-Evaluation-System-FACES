@@ -31,11 +31,11 @@ class ReadyModel():
 		elif self.model_type == "generalizedsvm":
 			self.input_shape=(128,128,3)
 			self.normalize = True
-			self.model = keras.models.load_model('generalizedSVM.h5', custom_objects=dependencies)
+			self.model = keras.models.load_model('trained_models/generalizedSVM.h5', custom_objects=dependencies)
 		elif self.model_type == "fastsvm":
 			self.normalize = True
 			self.input_shape=(128,128,3)
-			self.model = keras.models.load_model('fastSVM.h5', custom_objects=dependencies)
+			self.model = keras.models.load_model('trained_models/fastSVM.h5', custom_objects=dependencies)
 		else:
 			raise Exception(f"Model type {model_type} not found. Try another model.")
 
@@ -44,7 +44,9 @@ class ReadyModel():
 		- use OpenCV face detector and convert to grayscale
 		- resize image
 		'''
-        # if type(bath) 
+		if type(batch) == "<class 'numpy.ndarray'>":
+			print("type check works!")
+		readyBatch = []
 		if len(batch.shape) == 3: #group single input as batch
 			batch = batch.reshape(1, *batch.shape)
 		for index, image in enumerate(batch):
@@ -55,9 +57,9 @@ class ReadyModel():
 			image = standardize_image(image, self.input_shape[0], self.input_shape[1])
 			# normalize if necessary
 			if self.normalize:
-				image = image / 255
-			batch[index] = image #store the result in original numpy array
-		return batch
+				image = image / 255.0
+			readyBatch.append(image) #store the result in original numpy array
+		return [readyBatch]
 
 	def MaxList(self, result, num_classes):
 		""" Pulls the top 'num_classes' emotions from result and returns a list of tuples
@@ -106,9 +108,9 @@ class ReadyModel():
 			
 
 if __name__ == '__main__':
+	model = ReadyModel()
 	import create_dataset
 	import matplotlib.pyplot as plt
-	model = ReadyModel("generalizedSVM")
 	dataLoader = create_dataset.DataLoader()
 	dataset = dataLoader.getDataset(start_index=300)[0]
 	
@@ -117,7 +119,7 @@ if __name__ == '__main__':
 	singleResult = model.classify(sample)
 	fig, ax = plt.subplots(2,1)
 	fig.suptitle("Single Sample")
-	ax[0].imshow(sample)
+	ax[0].imshow(sample/255.0) # normalzie to prevent clipping
 	for subIndex, emote in enumerate(singleResult[0]):
 		ax[1].bar(emote[1], emote[0]*100)
 	plt.show()
@@ -127,7 +129,7 @@ if __name__ == '__main__':
 	results = model.classify(batchSample)
 	for index, result in enumerate(results):
 		fig, ax = plt.subplots(2,1)
-		ax[0].imshow(batchSample[index])
+		ax[0].imshow(batchSample[index]/255) # normalize to prevent clipping
 		plt.suptitle(f"Image {index}")
 		for subIndex, emote in enumerate(result):
 			ax[1].bar(emote[1], emote[0]*100)
