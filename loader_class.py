@@ -9,13 +9,14 @@ dependencies = {'top3_acc' : top3_acc}
 
 class ReadyModel():
 	'''
-    LoadModel: class to load pretrained image emotion classifier
-    contains functions to:
-        - return predicted emotion string
-        - preprocess an image to get it ready for classifiaction
-        - return top prediction and/or top3 predictions
-    '''
+	ReadyModel: class to load pretrained image emotion classifier
+	contains functions to:
+	- return predicted emotion string
+	- preprocess an image to get it ready for classifiaction
+	- return top k predictions
+	'''
 	def __init__(self, model_type="cnn2"):
+		#initialize class members
 		self.model_type = model_type.lower()
 		self.input_shape = (60,60, 1)
 		# Set variables to indicate neccessary preprocessing steps
@@ -40,12 +41,8 @@ class ReadyModel():
 			raise Exception(f"Model type {model_type} not found. Try another model.")
 
 	def Preprocess(self, batch):
-		'''preprocesses batch accordingly so that model can take it as input
-		- use OpenCV face detector and convert to grayscale
-		- resize image
+		'''preprocesses batch according to model-specific requirements
 		'''
-		if type(batch) == "<class 'numpy.ndarray'>":
-			print("type check works!")
 		readyBatch = []
 		if len(batch.shape) == 3: #group single input as batch
 			batch = batch.reshape(1, *batch.shape)
@@ -58,11 +55,11 @@ class ReadyModel():
 			# normalize if necessary
 			if self.normalize:
 				image = image / 255.0
-			readyBatch.append(image) #store the result in original numpy array
+			readyBatch.append(image) #store the batch in new array
 		return [readyBatch]
 
-	def MaxList(self, result, num_classes):
-		""" Pulls the top 'num_classes' emotions from result and returns a list of tuples
+	def MaxList(self, result, k_most_confident_classes):
+		""" Pulls the top 'k_most_confident_classes' emotions from result and returns a list of tuples
 			containing """
 		classList = []
 		for index, probability in enumerate(result):
@@ -73,14 +70,15 @@ class ReadyModel():
 					classList.insert(rank, (probability, self.GetEmotion(index)))
 					isMax = True
 					break
-			if len(classList) < num_classes and not isMax: #fills the list with values
+			if len(classList) < k_most_confident_classes and not isMax: #fills the list with values
 				classList.append((probability, self.GetEmotion(index)))
 				continue
-			if len(classList) > num_classes: #keeps only top num_classes in result
+			if len(classList) > k_most_confident_classes: #keeps only top k_most_confident_classes in result
 				classList.pop()
 		return classList
 
 	def GetEmotion(self, x):
+		"""Decodes emotions based on an index from 0-9"""
 		return {
 			0: 'neutral frontal',
 			1: 'joy',
@@ -94,39 +92,56 @@ class ReadyModel():
 			9: 'kiss'
 		}[x]
 
-	def classify(self, input, num_classes=3):
+	def classify(self, input, k_most_confident_classes=3):
 		"""
-		Returns a list with the top 'num_classes' from model prediction.
+		Returns a list with the top 'k_most_confident_classes' from model prediction.
 		Each element is a tuple of (probability, emotion)
 		"""
 		batch = self.Preprocess(input) #handle preprocessing before model input
 		classes = []
 		results = self.model.predict(batch)
 		for prediction in results:
-			classes.append(self.MaxList(prediction, num_classes))
+			classes.append(self.MaxList(prediction, k_most_confident_classes))
 		return classes
 			
 
 if __name__ == '__main__':
+	print("Loading Model...")
 	model = ReadyModel()
+	print("Importing modules for testing...")
 	import create_dataset
 	import matplotlib.pyplot as plt
+	import time
+	print("Loading data...\r")
+	startTime = time.time()
 	dataLoader = create_dataset.DataLoader()
 	dataset = dataLoader.getDataset(start_index=300)[0]
+	loadTime = time.time() - startTime
+	print(f"Loaded in {loadTime} seconds.")
 	
 	#single prediction example
+	print("Loading single sample...", end="\r")
 	sample = iter(dataset).next()[0].numpy() #pulls one sample image
+	print("Making single prediction...", end="\r")
+	startTime = time.time()
 	singleResult = model.classify(sample)
+	predictTime = time.time() - startTime
+	print(f"Processed in {predictTime} seconds.")
 	fig, ax = plt.subplots(2,1)
 	fig.suptitle("Single Sample")
 	ax[0].imshow(sample/255.0) # normalzie to prevent clipping
 	for subIndex, emote in enumerate(singleResult[0]):
 		ax[1].bar(emote[1], emote[0]*100)
 	plt.show()
-	
+
 	#batch prediction example
+	print("Loading batch of sample...", end="\r")
 	batchSample = iter(dataset.shuffle(10).batch(20)).next()[0].numpy() #pulls 5 sample images
+	print("Making batch prediction...", end="\r")
+	startTime = time.time()
 	results = model.classify(batchSample)
+	batchPredictTime = time.time() - startTime
+	print(f"Processed batch in {predictTime} seconds.")
 	for index, result in enumerate(results):
 		fig, ax = plt.subplots(2,1)
 		ax[0].imshow(batchSample[index]/255) # normalize to prevent clipping

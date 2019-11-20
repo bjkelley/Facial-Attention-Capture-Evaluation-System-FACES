@@ -4,30 +4,26 @@
 * Python 3.75+
 * Numpy 1.17.4
 * Scipy 1.3.2
+* matplotlib
 * Pillow 6.2.1
 * Tensorflow 2.0+
 * opencv-python (4.1.1.26) 
 * Virtualenv
-* matplotlib
-* etc
 
 ## Modules
 
 ### create_dataset.py
 blurb about most prominent functions to use
 
-### image_mod_functions
+### image_mod_functions.py
 blurb about most prominent functions to use
 
-### how to actually use the CNN classifier (for live demo stuff):
-- to actually use the classifier for working on the live demo part, **predict_new_sample_example.py** is really helpful. you basically need to load the CNN classifer with the custom class **LoadModel**, read in the image, call ```image = LoadModel.preprocess(image)``` (, then call ```pred, top3_preds, top3_probs = LoadModel.classify(image)```. It might be noteworthy that ```LoadModel.preprocess()``` actually does facial detection/cropping with OpenCV, converts the image to grayscale, and resizes to the correct pixel amount needed (60x60 for the most accurate CNN model, 'cnn2').
-- **output of LoadModel.classify(image)**
-    - a tuple of 3 elements:
-        - predicted class: (ex neutral frontal)
-        - predicted top 3 classes (sorted): (ex ['neutral frontal', 'closed', 'sadness'])
-        - predicted top 3 classes probs (sorted): (ex [0.53434867, 0.26075634, 0.16289178])
-- it's pretty helpful to open a jupyter notebook, paste all the code in **predict_new_sample_example.py** into a cell, and then looking at the output. or also can just run ```python predict_new_sample_example.py``` in a terminal.
-- i'm assuming for the live demo, we will be extracting each frame and classifying the emotion in that frame. we should probably do a very low frame rate (maybe like 3 per second?) and make sure that in the live demo we hold the emotions for a second lol. 
+### loader_class.py
+To load a pretrained model, create a new **ReadyModel** object with the name of the model you wish to use ("cnn2" is loaded by default). To make a prediction, call ```results = ReadyModel.classify(batch, k_most_confident_classes=3)``` where batch is either a numpy array with images of shape ```(batch_size, height, width, num_channels)``` or simply  ```(height, width, num_channels)```. ```results``` will contain list where each element is a list with length ```k_most_confident_classes``` and whose inner elements are tuples of ```(probability, emotion_string)```
+
+*```ReadyModel.preprocess()``` expects a square-image input with a face already isolated. It may convert the image to grayscale, and resizes as neccessary for the model_type selected (the most accurate CNN model, 'cnn2', will grayscale and resize inputs to (60, 60, 1)).*
+
+**predict_new_sample_example.py** contains a demo for proper use of the class.
 
 ### train_emotion_classifier.py
 
@@ -66,19 +62,24 @@ blurb about most prominent functions to use
 
 
 ## Installation
-**Fill this out as you create modules** to let everyone know how to setup important directories and how to download the right files for use.
+This install process assumes you have already installed python**3.7.5**. Visit [here](https://www.python.org/downloads/release/python-375/) to download. Virtualenv can also be installed with ```pip install virtualenv```.
 ### Step 1
-Make a new directory to contain the project files; create a virtual environment to manage installed packages and activate it:
+Clone our repository using:
+
+    git clone https://github.com/bjkelley/ECS_171_ML_Measure_Attentiveness.git
+
+### Step 2
+Make a new directory to contain the project files; create a virtual environment to manage installed packages and activate it with:
 
     virtualenv -p python3.7 venv
     source venv/bin/activate
-    
-or for windows:
+for linux or mac, or
 
     virtualenv -p python3.7 venv
     venv/Scripts/activate
-    
-or for mac:
+for windows.
 
-    virtualenv -p python3.7 venv
-    source venv/bin/activate
+### Step 3
+Download dependencies using:
+
+    pip -r requirements.txt
