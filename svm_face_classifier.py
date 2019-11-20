@@ -19,7 +19,7 @@ def applyTransform(dataset, num_repeat=3):
 				data.append(image)
 				labels.append(label)
 			elif num == 1:
-				data.append(create_dataset.rgb2gray(image))
+				data.append(create_dataset.rgb2gray(image, channels=3))
 				labels.append(label)
 			elif num == 2:
 				newImage = create_dataset.add_speckle(image, 0.05)
@@ -43,25 +43,6 @@ def applyTransform(dataset, num_repeat=3):
 				print("Weird error")
 			numsUsed.append(num)
 	return tf.data.Dataset.from_tensor_slices((data, labels))
-
-def CreateSVM(units=3, num_filters=15, conv_layers=1):
-	model = keras.Sequential()
-	model.add(layers.Conv2D(filters=num_filters, kernel_size=(4,4), strides=2,
-		padding='same', activation="relu", input_shape=(480,640, 3)))
-	for index in range(1, units):
-		for sub_layer in range(0,conv_layers-1):
-			model.add(layers.Conv2D(filters=num_filters, kernel_size=(2*index+4,2*index+4), strides=1, padding='same', activation="relu"))
-		# Downsampling layer
-		num_filters = num_filters - 4
-		model.add(layers.Conv2D(filters=num_filters, kernel_size=(2*index+4,2*index+4), strides=2, padding='same', activation="relu"))	
-	# model.add(layers.Conv2D(filters=15, kernel_size=(10,10), strides=1, padding='same', activation="relu")) #original configuration
-	model.add(layers.Flatten())
-	model.add(layers.Dense(10, kernel_regularizer=keras.regularizers.l2(0.01)))
-	model.add(layers.Activation('softmax'))
-	model.compile(loss='squared_hinge',
-	              optimizer='adadelta',
-	              metrics=['accuracy'])
-	return model
 
 def customSVM(input_shape = (480,640, 3)):
 	model = keras.Sequential()
@@ -120,8 +101,8 @@ def generalizedSVM(input_shape=(128,128, 3)):
 	return model
 
 dataLoader = create_dataset.DataLoader()
-trainSet = dataLoader.getDataset(num_samples=300) #gives first 30 subjects
-testSet = dataLoader.getDataset(start_index=300) #gives last 6 subjects
+trainSet = dataLoader.getDataset(num_samples=300)[0] #gives first 30 subjects
+testSet = dataLoader.getDataset(start_index=300)[0] #gives last 6 subjects
 testSet = testSet.batch(10)
 
 #Apply transformations to expand dataset

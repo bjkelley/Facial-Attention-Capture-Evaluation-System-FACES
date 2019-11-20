@@ -14,10 +14,13 @@ def add_gaussian_noise(image, mean, var):
 
     return noisy_image.numpy()
 
-def rgb2gray(image):
+def rgb2gray(image, channels=1):
     grayscale2D = np.dot(image[...,:3], [0.2989, 0.5870, 0.1140])
-    return np.repeat(grayscale2D[:, :, np.newaxis], 3, axis=2)
-    # return np.expand_dim(grayscale2D, axis=2)
+    if channels == 1:
+        return grayscale2D
+    if channels == 3:
+        return np.repeat(grayscale2D[:, :, np.newaxis], 3, axis=2)
+    
 
 def add_speckle(image, var):
     row,col,ch = image.shape
