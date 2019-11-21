@@ -2,6 +2,7 @@ from scipy import ndimage
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
 def rotate_image(image, degree):
     return ndimage.rotate(image, degree, reshape=False)
@@ -34,9 +35,14 @@ def down_sample_image(image):
     return image_downscaled
 
 def standardize_image(image, height, width):
-    im = tf.image.resize(image, size=[height, width], method=tf.image.ResizeMethod.NEAREST_NEIGHBOR, antialias=True)
-    image_downscaled = tf.dtypes.cast(im, dtype=tf.float32)
-    return image_downscaled
+    image = cv2.resize(image, dsize=(height, width), interpolation=cv2.INTER_NEAREST)
+    image_resized = image.astype(np.float32)
+
+    # if single sample, reshape to include the channel again
+    if (len(image_resized.shape) == 2):
+        image_resized = image_resized.reshape(*image_resized.shape, 1)
+    
+    return image_resized
 
 def up_sample_image(image):
     im = tf.image.resize(image, size=[900,1200], method=tf.image.ResizeMethod.BICUBIC)

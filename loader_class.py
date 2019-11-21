@@ -107,7 +107,7 @@ class ReadyModel():
 
 if __name__ == '__main__':
 	print("Loading Model...")
-	model = ReadyModel()
+	model = ReadyModel('generalizedSVM')
 	print("Importing modules for testing...")
 	import create_dataset
 	import matplotlib.pyplot as plt
@@ -141,7 +141,7 @@ if __name__ == '__main__':
 	startTime = time.time()
 	results = model.classify(batchSample)
 	batchPredictTime = time.time() - startTime
-	print(f"Processed batch in {predictTime} seconds.")
+	print(f"Processed batch in {batchPredictTime} seconds.")
 	for index, result in enumerate(results):
 		fig, ax = plt.subplots(2,1)
 		ax[0].imshow(batchSample[index]/255) # normalize to prevent clipping
