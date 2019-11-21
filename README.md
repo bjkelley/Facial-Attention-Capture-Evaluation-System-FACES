@@ -80,4 +80,4 @@ for windows.
 ### Step 3
 Download dependencies using:
 
-    pip -r requirements.txt
+    pip install -r requirements.txt
