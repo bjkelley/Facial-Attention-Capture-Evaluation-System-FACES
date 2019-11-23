@@ -8,6 +8,15 @@ import cv2
 from image_mod_functions import rotate_image, add_gaussian_noise, add_speckle, rgb2gray, down_sample_image, up_sample_image, standardize_image
 
 class DataLoader:
+    '''
+    DataLoader: The DataLoader class exists to create a tensorflow dataset object from an existing dataset of emotionally classified faces stored in a folder system.
+
+    Functions: 
+        get_emotion: An instance of a python switch statement used to label the images relative to their emotionally classified status based on the naming of the image file.
+        get_one_hot: returns the one hot-encoded label for the classification of the image.
+        getDataset: the function which aggregates the images into the tensorflow dataset object from the folder organization.
+        create_label_vector: creates the vector of labels for the classified images (necessary for creating the tensorflow labled dataset)              
+    '''
     def __init__(self, datapath = ""):
         self.datapath = datapath
 
