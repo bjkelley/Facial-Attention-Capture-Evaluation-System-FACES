@@ -4,6 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
+'''
+    A suite of functions to manipulate numpy image matrices. Manipulations include rotation, additive gaussian noise, speckle,
+    up and down sampling, size standardization, to gray scal.
+'''
 def rotate_image(image, degree):
     return ndimage.rotate(image, degree, reshape=False)
 
