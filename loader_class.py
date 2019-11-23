@@ -17,6 +17,7 @@ class ReadyModel():
 	- preprocess an image to get it ready for classifiaction
 	- return top k predictions
 	'''
+	
 	def __init__(self, model_type="cnn2"):
 		#initialize class members
 		self.model_type = model_type.lower()

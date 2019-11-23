@@ -13,17 +13,15 @@
 ## Modules
 
 ### create_dataset.py
-blurb about most prominent functions to use
+The focus of this module is to create a tensorflow dataset object of labeled images from a folder organization. The "getDataset" function does exactly this by globbing through the folder hierarchy in sorted order and returning the dataset. It is important to note that the "getDataset" function as well normalizes the images to float on [0,1] and converts them to greyscale. Ultimately the "getDataset" functions returns this normalized, greyscale, tensorflow dataset object of the images acquired from the FacesDB dataset used for this project.
 
 ### image_mod_functions.py
-blurb about most prominent functions to use
+A suite of functions to manipulate numpy image matrices. Manipulations include rotation, additive gaussian noise, speckle, up and down sampling, size standardization, to gray scale.
 
 ### loader_class.py
 To load a pretrained model, create a new **ReadyModel** object with the name of the model you wish to use ("cnn2" is loaded by default). To make a prediction, call ```results = ReadyModel.classify(batch, k_most_confident_classes=3)``` where batch is either a numpy array with images of shape ```(batch_size, height, width, num_channels)``` or simply  ```(height, width, num_channels)```. ```results``` will contain list where each element is a list with length ```k_most_confident_classes``` and whose inner elements are tuples of ```(probability, emotion_string)```
 
-*```ReadyModel.preprocess()``` expects a square-image input with a face already isolated. It may convert the image to grayscale, and resizes as neccessary for the model_type selected (the most accurate CNN model, 'cnn2', will grayscale and resize inputs to (60, 60, 1)).*
-
-**predict_new_sample_example.py** contains a demo for proper use of the class.
+*```ReadyModel.preprocess()``` is called by ```ReadyModel.classify()```, and expects a square-image input with a face already isolated. It may convert the image to grayscale, and resizes as neccessary for the model_type selected (the most accurate CNN model, 'cnn2', will grayscale and resize inputs to (60, 60, 1)).*
 
 ### train_emotion_classifier.py
 
@@ -82,4 +80,4 @@ for windows.
 ### Step 3
 Download dependencies using:
 
-    pip -r requirements.txt
+    pip install -r requirements.txt

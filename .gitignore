@@ -3,3 +3,5 @@ checkpoints/
 plots/
 __pycache__/
 haarcascade_frontalface_default.xml
+
+yolov3-wider_16000.weights
