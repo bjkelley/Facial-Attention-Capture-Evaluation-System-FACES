@@ -2,7 +2,6 @@ from tensorflow import keras
 from image_mod_functions import standardize_image, rgb2gray
 import functools
 import numpy as np
-import time
 
 # define custom metric, needed as a dependency in keras.models.load_model
 top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
@@ -114,7 +113,7 @@ if __name__ == '__main__':
 	print("Importing modules for testing...")
 	import create_dataset
 	import matplotlib.pyplot as plt
-	# import time
+	import time
 	print("Loading data...\r")
 	startTime = time.time()
 	dataLoader = create_dataset.DataLoader()
