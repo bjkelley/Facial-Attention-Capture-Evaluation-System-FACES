@@ -1,6 +1,8 @@
 from tensorflow import keras
 from image_mod_functions import standardize_image, rgb2gray
 import functools
+import numpy as np
+import time
 
 # define custom metric, needed as a dependency in keras.models.load_model
 top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
@@ -43,9 +45,9 @@ class ReadyModel():
 	def Preprocess(self, batch):
 		'''preprocesses batch according to model-specific requirements
 		'''
-		readyBatch = []
 		if len(batch.shape) == 3: #group single input as batch
 			batch = batch.reshape(1, *batch.shape)
+		readyBatch = np.empty(shape=(batch.shape[0],*self.input_shape))
 		for index, image in enumerate(batch):
 			# grayscale and standardize first for maximum precision
 			if self.gray:
@@ -55,8 +57,8 @@ class ReadyModel():
 			# normalize if necessary
 			if self.normalize:
 				image = image / 255.0
-			readyBatch.append(image) #store the batch in new array
-		return [readyBatch]
+			readyBatch[index]= image #store the batch in new array
+		return readyBatch
 
 	def MaxList(self, result, k_most_confident_classes):
 		""" Pulls the top 'k_most_confident_classes' emotions from result and returns a list of tuples
@@ -107,11 +109,11 @@ class ReadyModel():
 
 if __name__ == '__main__':
 	print("Loading Model...")
-	model = ReadyModel('generalizedSVM')
+	model = ReadyModel()
 	print("Importing modules for testing...")
 	import create_dataset
 	import matplotlib.pyplot as plt
-	import time
+	# import time
 	print("Loading data...\r")
 	startTime = time.time()
 	dataLoader = create_dataset.DataLoader()
@@ -120,9 +122,9 @@ if __name__ == '__main__':
 	print(f"Loaded in {loadTime} seconds.")
 	
 	#single prediction example
-	print("Loading single sample...", end="\r")
+	print("Loading single sample...", end="\r", flush=True)
 	sample = iter(dataset).next()[0].numpy() #pulls one sample image
-	print("Making single prediction...", end="\r")
+	print("Making single prediction...", end="\r", flush=True)
 	startTime = time.time()
 	singleResult = model.classify(sample)
 	predictTime = time.time() - startTime
@@ -135,9 +137,9 @@ if __name__ == '__main__':
 	plt.show()
 
 	#batch prediction example
-	print("Loading batch of sample...", end="\r")
+	print("Loading batch of sample...", end="\r", flush=True)
 	batchSample = iter(dataset.shuffle(10).batch(20)).next()[0].numpy() #pulls 5 sample images
-	print("Making batch prediction...", end="\r")
+	print("Making batch prediction...", end="\r", flush=True)
 	startTime = time.time()
 	results = model.classify(batchSample)
 	batchPredictTime = time.time() - startTime
