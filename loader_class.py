@@ -17,6 +17,7 @@ class ReadyModel():
 	- preprocess an image to get it ready for classifiaction
 	- return top k predictions
 	'''
+	
 	def __init__(self, model_type="cnn2"):
 		#initialize class members
 		self.model_type = model_type.lower()
@@ -48,6 +49,7 @@ class ReadyModel():
 		readyBatch = np.empty(shape=(batch.shape[0], *self.input_shape))
 		if len(batch.shape) == 3: #group single input as batch
 			batch = batch.reshape(1, *batch.shape)
+		readyBatch = np.empty(shape=(batch.shape[0],*self.input_shape))
 		for index, image in enumerate(batch):
 			# grayscale and standardize first for maximum precision
 			if self.gray:
@@ -57,8 +59,8 @@ class ReadyModel():
 			# normalize if necessary
 			if self.normalize:
 				image = image / 255.0
-			readyBatch[index] = image #store the batch in new array
-		return [readyBatch]
+			readyBatch[index]= image #store the batch in new array
+		return readyBatch
 
 	def MaxList(self, result, k_most_confident_classes):
 		""" Pulls the top 'k_most_confident_classes' emotions from result and returns a list of tuples
@@ -120,11 +122,11 @@ if __name__ == '__main__':
 	dataset = dataLoader.getDataset(start_index=300)[0]
 	loadTime = time.time() - startTime
 	print(f"Loaded in {loadTime} seconds.")
-	
-	# single prediction example
-	print("Loading single sample...", end="\r")
+
+	#single prediction example
+	print("Loading single sample...", end="\r", flush=True)
 	sample = iter(dataset).next()[0].numpy() #pulls one sample image
-	print("Making single prediction...", end="\r")
+	print("Making single prediction...", end="\r", flush=True)
 	startTime = time.time()
 	singleResult = model.classify(sample)
 	predictTime = time.time() - startTime
@@ -141,9 +143,9 @@ if __name__ == '__main__':
 	batch_size = 7
 	num_columns = 4
 
-	print("Loading batch of sample...", end="\r")
-	batchSample = iter(dataset.shuffle(10).batch(batch_size)).next()[0].numpy()  # pulls 5 sample images
-	print("Making batch prediction...", end="\r")
+	print("Loading batch of sample...", end="\r", flush=True)
+	batchSample = iter(dataset.shuffle(10).batch(batch_size)).next()[0].numpy() #pulls 5 sample images
+	print("Making batch prediction...", end="\r", flush=True)
 	startTime = time.time()
 	results = model.classify(batchSample)
 	batchPredictTime = time.time() - startTime
@@ -157,12 +159,7 @@ if __name__ == '__main__':
 
 	gs = fig3.add_gridspec(rows * 3, num_columns)
 
-	print(f"{num_columns} columns and {rows * 3} rows")
-
 	for index, result in enumerate(results):
-		print(f"row start: {((index // num_columns)*3)}")
-		print(f"row end: {((index // num_columns)*3 + 2)}")
-		print(f"column: {index % num_columns}")
 		current_axis = fig3.add_subplot(gs[((index // num_columns)*3):((index // num_columns)*3 + 2), (index % num_columns)])
 		barchart_1 = fig3.add_subplot(gs[(index // num_columns)*3 + 2, (index % num_columns)])
 		current_axis.imshow(batchSample[index]/255) # normalize to prevent clipping

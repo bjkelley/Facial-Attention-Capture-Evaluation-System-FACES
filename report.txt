@@ -1,0 +1,36 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 1 files
+Detected 0 issues that require attention
+--------------------------------------------------------------------------------
+================================================================================
+Detailed log follows:
+
+================================================================================
+--------------------------------------------------------------------------------
+Processing file 'FacedSegmentor.py'
+ outputting to 'FacedSegmentor2.py'
+--------------------------------------------------------------------------------
+
+66:21: INFO: Renamed 'tf.gfile.GFile' to 'tf.io.gfile.GFile'
+67:32: INFO: Renamed 'tf.GraphDef' to 'tf.compat.v1.GraphDef'
+73:24: INFO: Renamed 'tf.train.import_meta_graph' to 'tf.compat.v1.train.import_meta_graph'
+76:23: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+77:28: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+78:24: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+79:28: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+80:28: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+81:21: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+82:21: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+178:24: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+180:21: INFO: Renamed 'tf.gfile.GFile' to 'tf.io.gfile.GFile'
+181:32: INFO: Renamed 'tf.GraphDef' to 'tf.compat.v1.GraphDef'
+187:24: INFO: Renamed 'tf.train.import_meta_graph' to 'tf.compat.v1.train.import_meta_graph'
+190:23: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+191:28: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+192:21: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+193:21: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+194:21: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+195:21: INFO: Renamed 'tf.get_default_graph' to 'tf.compat.v1.get_default_graph'
+--------------------------------------------------------------------------------
+

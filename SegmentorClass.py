@@ -3,24 +3,43 @@ import time
 import numpy as np
 from seg_utils import *
 from loader_class import *
+from FacedSegmentor2 import FaceDetector
 
 model_cfg = 'yolov3-face.cfg'
 model_weights = 'yolov3-wider_16000.weights'
 # yolov3-wider_16000.weights is too big to push to github for some reason
+buff = 10 # oversize drawn rectangle for viewing
 
 
 class Segmentor:
-    def __init__(self, impl="Yolo"):
+    def __init__(self, impl="faced"):
         imples = {
                   "Haar": (self.HaarSegment, self.HaarInit),
-                  "Yolo": (self.YoloSegment, self.YoloInit)
+                  "Yolo": (self.YoloSegment, self.YoloInit),
+                  "faced": (self.facedSegment, self.facedInit)
                 }
 
         self.initimple = imples[impl][1]() #run initilizer
         self.Segment = imples[impl][0]
         self.output_dim = (128,128)
+        self.frame = []
 
+    def facedInit(self):
+        self.face_detector = FaceDetector()
 
+    def facedSegment(self, image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        bboxes = self.face_detector.predict(image)
+        Face_im = []
+        for (x, y, w, h, _) in bboxes:
+            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = self.resize(cut_face)
+            if(cut_face is not None and cut_face.all() != None):
+                Face_im.append(cut_face)
+
+        faces = [[x - w // 2, y - h // 2, w, h] for (x, y, w, h, _) in bboxes]
+
+        return faces, Face_im
 
     def YoloInit(self):
         self.net = cv2.dnn.readNetFromDarknet(model_cfg, model_weights)
@@ -56,9 +75,9 @@ class Segmentor:
         outs = self.net.forward(get_outputs_names(self.net))
 
         # Remove the bounding boxes with low confidence
-        faces = post_process(frame, outs, CONF_THRESHOLD, NMS_THRESHOLD)
+        faces = post_process(segmentor.frame, outs, CONF_THRESHOLD, NMS_THRESHOLD)
         for (x, y, w, h) in faces:
-            cut_face = frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face.all() != None):
                 Face_im.append(cut_face)
@@ -112,7 +131,7 @@ class Segmentor:
             minSize=(5, 5)
         )
         for (x, y, w, h) in faces:
-            cut_face = frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face.all() != None):
                 Face_im.append(cut_face)
@@ -142,14 +161,13 @@ class Segmentor:
 if __name__ == "__main__":
     video_capture = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
-    buff = 15 # oversize drawn rectangle for viewing
     model = ReadyModel('generalizedSVM')
 
     segmentor = Segmentor()
 
     while True:
-        ret, frame = video_capture.read()
-        faces, cuts = segmentor.Segment(frame)
+        ret, segmentor.frame = video_capture.read()
+        faces, cuts = segmentor.Segment(segmentor.frame)
 
         if len(cuts) > 0:
                 print("Loading single sample...", end="\r")
@@ -163,9 +181,9 @@ if __name__ == "__main__":
                 print(singleResult)
 
         for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x - buff, y - buff), (x + w + buff, y + h + buff), (0, 255, 0), 2)
+            cv2.rectangle(segmentor.frame, (x - buff, y - buff), (x + w + buff, y + h + buff), (0, 255, 0), 2)
 
         # Display the resulting frame
-        cv2.imshow('Video', frame)
+        cv2.imshow('Video', segmentor.frame)
         if cv2.waitKey(100) & 0xFF == ord('q'):
             break
