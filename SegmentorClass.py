@@ -32,7 +32,7 @@ class Segmentor:
         bboxes = self.face_detector.predict(image)
         Face_im = []
         for (x, y, w, h, _) in bboxes:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face is not None and cut_face.all() != None):
                 Face_im.append(cut_face)
@@ -75,9 +75,9 @@ class Segmentor:
         outs = self.net.forward(get_outputs_names(self.net))
 
         # Remove the bounding boxes with low confidence
-        faces = post_process(segmentor.frame, outs, CONF_THRESHOLD, NMS_THRESHOLD)
+        faces = post_process(image, outs, CONF_THRESHOLD, NMS_THRESHOLD)
         for (x, y, w, h) in faces:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face.all() != None):
                 Face_im.append(cut_face)
@@ -131,7 +131,7 @@ class Segmentor:
             minSize=(5, 5)
         )
         for (x, y, w, h) in faces:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face.all() != None):
                 Face_im.append(cut_face)
