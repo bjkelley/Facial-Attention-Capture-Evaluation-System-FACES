@@ -1,6 +1,8 @@
 from tensorflow import keras
 from image_mod_functions import standardize_image, rgb2gray
 import functools
+import numpy as np
+import matplotlib.gridspec as gridspec
 
 # define custom metric, needed as a dependency in keras.models.load_model
 top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
@@ -43,7 +45,7 @@ class ReadyModel():
 	def Preprocess(self, batch):
 		'''preprocesses batch according to model-specific requirements
 		'''
-		readyBatch = []
+		readyBatch = np.empty(shape=(batch.shape[0], *self.input_shape))
 		if len(batch.shape) == 3: #group single input as batch
 			batch = batch.reshape(1, *batch.shape)
 		for index, image in enumerate(batch):
@@ -55,7 +57,7 @@ class ReadyModel():
 			# normalize if necessary
 			if self.normalize:
 				image = image / 255.0
-			readyBatch.append(image) #store the batch in new array
+			readyBatch[index] = image #store the batch in new array
 		return [readyBatch]
 
 	def MaxList(self, result, k_most_confident_classes):
@@ -107,7 +109,7 @@ class ReadyModel():
 
 if __name__ == '__main__':
 	print("Loading Model...")
-	model = ReadyModel('generalizedSVM')
+	model = ReadyModel("generalizedsvm")
 	print("Importing modules for testing...")
 	import create_dataset
 	import matplotlib.pyplot as plt
@@ -119,7 +121,7 @@ if __name__ == '__main__':
 	loadTime = time.time() - startTime
 	print(f"Loaded in {loadTime} seconds.")
 	
-	#single prediction example
+	# single prediction example
 	print("Loading single sample...", end="\r")
 	sample = iter(dataset).next()[0].numpy() #pulls one sample image
 	print("Making single prediction...", end="\r")
@@ -134,18 +136,38 @@ if __name__ == '__main__':
 		ax[1].bar(emote[1], emote[0]*100)
 	plt.show()
 
-	#batch prediction example
+	# grid output example
+
+	batch_size = 7
+	num_columns = 4
+
 	print("Loading batch of sample...", end="\r")
-	batchSample = iter(dataset.shuffle(10).batch(20)).next()[0].numpy() #pulls 5 sample images
+	batchSample = iter(dataset.shuffle(10).batch(batch_size)).next()[0].numpy()  # pulls 5 sample images
 	print("Making batch prediction...", end="\r")
 	startTime = time.time()
 	results = model.classify(batchSample)
 	batchPredictTime = time.time() - startTime
 	print(f"Processed batch in {batchPredictTime} seconds.")
+
+	fig3 = plt.figure(constrained_layout=True)
+	rows = (batch_size // num_columns)
+
+	if batch_size % num_columns != 0:
+		rows = rows + 1
+
+	gs = fig3.add_gridspec(rows * 3, num_columns)
+
+	print(f"{num_columns} columns and {rows * 3} rows")
+
 	for index, result in enumerate(results):
-		fig, ax = plt.subplots(2,1)
-		ax[0].imshow(batchSample[index]/255) # normalize to prevent clipping
-		plt.suptitle(f"Image {index}")
+		print(f"row start: {((index // num_columns)*3)}")
+		print(f"row end: {((index // num_columns)*3 + 2)}")
+		print(f"column: {index % num_columns}")
+		current_axis = fig3.add_subplot(gs[((index // num_columns)*3):((index // num_columns)*3 + 2), (index % num_columns)])
+		barchart_1 = fig3.add_subplot(gs[(index // num_columns)*3 + 2, (index % num_columns)])
+		current_axis.imshow(batchSample[index]/255) # normalize to prevent clipping
+		current_axis.set_axis_off()
 		for subIndex, emote in enumerate(result):
-			ax[1].bar(emote[1], emote[0]*100)
-		plt.show()
+			barchart_1.bar(emote[1], emote[0] * 100)
+
+	plt.show()
