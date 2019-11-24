@@ -5,6 +5,19 @@ from threading import Thread
 from loader_class import *
 from SegmentorClass import *
 
+EMOTION_COLORS = {  # BGR Values
+    'neutral frontal': (255, 229, 0), # Light Blue
+	'joy': (0, 242, 255),   # Yellow
+	'sadness': (255, 0, 0), # Blue
+	'surprise': (0, 132, 255),   # Orange
+	'anger': (0, 0, 255),   # Red
+	'disgust': (0, 255, 0), # Green
+	'fear': (255, 0, 183),  # Purple
+	'opened': (255, 255, 255),  # White
+    'closed': (0, 0, 0),    # Black
+	'kiss': (234, 0, 255)  # Pink
+}
+
 def convertToGrayscale():
     cap = cv2.VideoCapture(0)
 
@@ -26,31 +39,35 @@ def convertToGrayscale():
 
 
 def segmentAndPredict(segmentor, frame, queue):
-    print("START THREAD")
     faces, cuts = segmentor.Segment(frame)
+    predictions = []
 
     if len(cuts) > 0:
-            print("Loading single sample...", end="\r")
-            sample = cuts[0]
+        print("Loading samples...", end="\r")
+        for sample in cuts:
+            
             print(sample.shape)
             print("Making single prediction...", end="\r")
             startTime = time.time()
-            singleResult = model.classify(sample)
+            prediction = model.classify(sample)
             predictTime = time.time() - startTime
             print(f"Processed in {predictTime} seconds.")
-            print(singleResult)
+            print("PRED: ", prediction[0])
+            predictions.append(prediction[0])
     
     queue.put(faces)
+    queue.put(predictions)
 
 if __name__ == "__main__":    
     font = cv2.FONT_HERSHEY_SIMPLEX
     model = ReadyModel('generalizedSVM')
     segmentor = Segmentor('Yolo')
+    BUFF = 15
 
     IMG_PROCESS_TIME = 2.5
     thread = None
     faces = []
-    facesQueue = Queue()
+    resultsQueue = Queue()
 
     video_capture = cv2.VideoCapture(0) # Begin capturing video from camera
 
@@ -61,14 +78,17 @@ if __name__ == "__main__":
         if time.time() - lastImageProcess > IMG_PROCESS_TIME:    # Update image segmentation and emotional classification at a constant rate
             if (thread):
                 thread.join()   # Make sure image processing has finished and get results
-                faces = facesQueue.get()
+                faces = resultsQueue.get()
+                predictions = resultsQueue.get()
 
             lastImageProcess = time.time()
-            thread = Thread(target=segmentAndPredict, args=(segmentor, frame, facesQueue), daemon=True) # Start new image processing
+            thread = Thread(target=segmentAndPredict, args=(segmentor, frame, resultsQueue), daemon=True) # Start new image processing
             thread.start()
 
-        for (x, y, w, h) in faces:  # Draw rectangle around each face
-            cv2.rectangle(frame, (x - buff, y - buff), (x + w + buff, y + h + buff), (0, 255, 0), 2)
+        for i in range(0, len(faces)):
+            x, y, w, h = faces[i]  # Draw rectangle around each face
+            color = EMOTION_COLORS[predictions[i][0][1]]
+            cv2.rectangle(frame, (x - BUFF, y - BUFF), (x + w + BUFF, y + h + BUFF), color=color, thickness=2)
 
         # Display the resulting frame
         cv2.imshow('Video', frame)
