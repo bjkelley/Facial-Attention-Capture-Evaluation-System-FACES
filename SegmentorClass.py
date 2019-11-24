@@ -8,7 +8,7 @@ from FacedSegmentor2 import FaceDetector
 model_cfg = 'yolov3-face.cfg'
 model_weights = 'yolov3-wider_16000.weights'
 # yolov3-wider_16000.weights is too big to push to github for some reason
-buff = 15 # oversize drawn rectangle for viewing
+buff = 10 # oversize drawn rectangle for viewing
 
 
 class Segmentor:
@@ -32,14 +32,12 @@ class Segmentor:
         bboxes = self.face_detector.predict(image)
         Face_im = []
         for (x, y, w, h, _) in bboxes:
-            x = x - w // 2
-            y = y + h // 2
             cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face is not None and cut_face.all() != None):
                 Face_im.append(cut_face)
 
-        faces = [[x,y,w,h] for (x, y, w, h, _) in bboxes]
+        faces = [[x - w // 2, y - h // 2, w, h] for (x, y, w, h, _) in bboxes]
 
         return faces, Face_im
 
