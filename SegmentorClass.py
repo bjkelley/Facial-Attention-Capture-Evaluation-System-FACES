@@ -3,6 +3,7 @@ import time
 import numpy as np
 from seg_utils import *
 from loader_class import *
+from FacedSegmentor2 import FaceDetector
 
 model_cfg = 'yolov3-face.cfg'
 model_weights = 'yolov3-wider_16000.weights'
@@ -11,10 +12,11 @@ buff = 15 # oversize drawn rectangle for viewing
 
 
 class Segmentor:
-    def __init__(self, impl="Yolo"):
+    def __init__(self, impl="faced"):
         imples = {
                   "Haar": (self.HaarSegment, self.HaarInit),
-                  "Yolo": (self.YoloSegment, self.YoloInit)
+                  "Yolo": (self.YoloSegment, self.YoloInit),
+                  "faced": (self.facedSegment, self.facedInit)
                 }
 
         self.initimple = imples[impl][1]() #run initilizer
@@ -22,7 +24,24 @@ class Segmentor:
         self.output_dim = (128,128)
         self.frame = []
 
+    def facedInit(self):
+        self.face_detector = FaceDetector()
 
+    def facedSegment(self, image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        bboxes = self.face_detector.predict(image)
+        Face_im = []
+        for (x, y, w, h, _) in bboxes:
+            x = x - w // 2
+            y = y + h // 2
+            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = self.resize(cut_face)
+            if(cut_face is not None and cut_face.all() != None):
+                Face_im.append(cut_face)
+
+        faces = [[x,y,w,h] for (x, y, w, h, _) in bboxes]
+
+        return faces, Face_im
 
     def YoloInit(self):
         self.net = cv2.dnn.readNetFromDarknet(model_cfg, model_weights)
