@@ -7,6 +7,7 @@ from FacedSegmentor2 import FaceDetector
 
 model_cfg = 'yolov3-face.cfg'
 model_weights = 'yolov3-wider_16000.weights'
+cascPath = "haarcascade_frontalface_default.xml"
 # yolov3-wider_16000.weights is too big to push to github for some reason
 buff = 10 # oversize drawn rectangle for viewing
 
@@ -32,7 +33,7 @@ class Segmentor:
         bboxes = self.face_detector.predict(image)
         Face_im = []
         for (x, y, w, h, _) in bboxes:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face is not None and cut_face.all() != None):
                 Face_im.append(cut_face)
@@ -65,8 +66,9 @@ class Segmentor:
         blob = cv2.dnn.blobFromImage(image, 1 / 255, (image.shape[0] , image.shape[1]),
                                      [0, 0, 0], 1, crop=False)
 
-
+        print("yolo")
         print(image.shape)
+
 
         # Sets the input to the network
         self.net.setInput(blob)
@@ -75,11 +77,11 @@ class Segmentor:
         outs = self.net.forward(get_outputs_names(self.net))
 
         # Remove the bounding boxes with low confidence
-        faces = post_process(segmentor.frame, outs, CONF_THRESHOLD, NMS_THRESHOLD)
+        faces = post_process(image, outs, CONF_THRESHOLD, NMS_THRESHOLD)
         for (x, y, w, h) in faces:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
-            if(cut_face.all() != None):
+            if(type(cut_face) != None):
                 Face_im.append(cut_face)
 
         print(faces)
@@ -109,7 +111,6 @@ class Segmentor:
 
 
     def HaarInit(self):
-        cascPath = "Segmentor_data/haarcascade_frontalface_default.xml"
         self.faceCascade = cv2.CascadeClassifier(cascPath)
 
 
@@ -131,9 +132,9 @@ class Segmentor:
             minSize=(5, 5)
         )
         for (x, y, w, h) in faces:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
-            if(cut_face.all() != None):
+            if(type(cut_face) != None):
                 Face_im.append(cut_face)
 
         return faces, Face_im
