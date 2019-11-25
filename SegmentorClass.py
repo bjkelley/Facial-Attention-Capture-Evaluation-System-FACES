@@ -158,7 +158,6 @@ class Segmentor:
         pass
 
 
-
 if __name__ == "__main__":
     video_capture = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -169,10 +168,10 @@ if __name__ == "__main__":
     while True:
         ret, segmentor.frame = video_capture.read()
         faces, cuts = segmentor.Segment(segmentor.frame)
-
-        if len(cuts) > 0:
-                print("Loading single sample...", end="\r")
-                sample = cuts[0]
+        print("Loading sample...", end="\r")
+        print(f"Found {len(cuts)} faces.")
+        for i in range(len(cuts)):
+                sample = cuts[i]
                 print(sample.shape)
                 print("Making single prediction...", end="\r")
                 startTime = time.time()
@@ -180,7 +179,6 @@ if __name__ == "__main__":
                 predictTime = time.time() - startTime
                 print(f"Processed in {predictTime} seconds.")
                 print(singleResult)
-
         for (x, y, w, h) in faces:
             cv2.rectangle(segmentor.frame, (x - buff, y - buff), (x + w + buff, y + h + buff), (0, 255, 0), 2)
 
