@@ -5,17 +5,20 @@ from threading import Thread
 from loader_class import *
 from SegmentorClass import *
 
+ATTENTIVE_COLOR = (0, 255, 0) # Green
+INATTENTIVE_COLOR = (0, 0, 255) # Red 
+
 EMOTION_COLORS = {  # BGR Values
-    'neutral frontal': (255, 229, 0), # Light Blue
-	'joy': (0, 242, 255),   # Yellow
-	'sadness': (255, 0, 0), # Blue
-	'surprise': (0, 132, 255),   # Orange
-	'anger': (0, 0, 255),   # Red
-	'disgust': (0, 255, 0), # Green
-	'fear': (255, 0, 183),  # Purple
-	'opened': (255, 255, 255),  # White
-    'closed': (0, 0, 0),    # Black
-	'kiss': (234, 0, 255)  # Pink
+    'neutral frontal': INATTENTIVE_COLOR,
+	'joy': ATTENTIVE_COLOR,
+	'sadness': INATTENTIVE_COLOR,
+	'surprise': ATTENTIVE_COLOR,
+	'anger': INATTENTIVE_COLOR,
+	'disgust': INATTENTIVE_COLOR,
+	'fear': INATTENTIVE_COLOR,
+	'opened': ATTENTIVE_COLOR,
+    'closed': INATTENTIVE_COLOR,
+	'kiss': ATTENTIVE_COLOR
 }
 
 def convertToGrayscale():
