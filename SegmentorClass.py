@@ -29,8 +29,15 @@ class Segmentor:
         self.face_detector = FaceDetector()
 
     def facedSegment(self, image):
+        """
+        Use YOLO segmentor to get facial images
+
+        :return:
+        List of arrays: [X, Y, W, H] and list of np arrays of cut images
+
+        """
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        bboxes = self.face_detector.predict(image)
+        bboxes = self.face_detector.predict(image) #get bounding boxes
         Face_im = []
         for (x, y, w, h, _) in bboxes:
             cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
@@ -38,6 +45,7 @@ class Segmentor:
             if(cut_face is not None and cut_face.all() != None):
                 Face_im.append(cut_face)
 
+        #convert from center of rectangle to top left corner
         faces = [[x - w // 2, y - h // 2, w, h] for (x, y, w, h, _) in bboxes]
 
         return faces, Face_im
@@ -51,7 +59,7 @@ class Segmentor:
 
     def YoloSegment(self, image):
         """
-        Use Haar segmentor to get facial images
+        Use YOLO segmentor to get facial images
 
         :return:
         List of arrays: [X, Y, W, H] and list of np arrays of cut images
@@ -90,10 +98,6 @@ class Segmentor:
         return faces, Face_im
 
 
-
-
-
-
     def refined_box(self, left, top, width, height):
         right = left + width
         bottom = top + height
@@ -109,7 +113,7 @@ class Segmentor:
 
         return left, top, right, bottom
 
-
+    #initializes Haar classifier
     def HaarInit(self):
         self.faceCascade = cv2.CascadeClassifier(cascPath)
 
@@ -139,6 +143,7 @@ class Segmentor:
 
         return faces, Face_im
 
+    #resizes input image to the necessary output dimension
     def resize(self, im):
         try:
             assert(im.size != 0)
@@ -166,8 +171,8 @@ if __name__ == "__main__":
     segmentor = Segmentor()
 
     while True:
-        ret, segmentor.frame = video_capture.read()
-        faces, cuts = segmentor.Segment(segmentor.frame)
+        ret, segmentor.frame = video_capture.read() #read frame from video
+        faces, cuts = segmentor.Segment(segmentor.frame) #detect faces in frame
         print("Loading sample...", end="\r")
         print(f"Found {len(cuts)} faces.")
         for i in range(len(cuts)):
@@ -175,10 +180,12 @@ if __name__ == "__main__":
                 print(sample.shape)
                 print("Making single prediction...", end="\r")
                 startTime = time.time()
-                singleResult = model.classify(sample)
+                singleResult = model.classify(sample) #emotional classification
                 predictTime = time.time() - startTime
                 print(f"Processed in {predictTime} seconds.")
                 print(singleResult)
+
+        #draw rectangle around each detected face
         for (x, y, w, h) in faces:
             cv2.rectangle(segmentor.frame, (x - buff, y - buff), (x + w + buff, y + h + buff), (0, 255, 0), 2)
 
