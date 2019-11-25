@@ -101,7 +101,7 @@ def post_process(frame, outs, conf_threshold, nms_threshold):
         left, top, right, bottom = refined_box(left, top, width, height)
         # draw_predict(frame, confidences[i], left, top, left + width,
         #              top + height)
-        draw_predict(frame, confidences[i], left, top, right, bottom)
+        #draw_predict(frame, confidences[i], left, top, right, bottom)
     return final_boxes
 
 

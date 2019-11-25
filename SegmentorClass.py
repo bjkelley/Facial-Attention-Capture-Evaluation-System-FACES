@@ -7,6 +7,7 @@ from FacedSegmentor2 import FaceDetector
 
 model_cfg = 'yolov3-face.cfg'
 model_weights = 'yolov3-wider_16000.weights'
+cascPath = "haarcascade_frontalface_default.xml"
 # yolov3-wider_16000.weights is too big to push to github for some reason
 buff = 10 # oversize drawn rectangle for viewing
 
@@ -28,15 +29,23 @@ class Segmentor:
         self.face_detector = FaceDetector()
 
     def facedSegment(self, image):
+        """
+        Use YOLO segmentor to get facial images
+
+        :return:
+        List of arrays: [X, Y, W, H] and list of np arrays of cut images
+
+        """
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        bboxes = self.face_detector.predict(image)
+        bboxes = self.face_detector.predict(image) #get bounding boxes
         Face_im = []
         for (x, y, w, h, _) in bboxes:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
             if(cut_face is not None and cut_face.all() != None):
                 Face_im.append(cut_face)
 
+        #convert from center of rectangle to top left corner
         faces = [[x - w // 2, y - h // 2, w, h] for (x, y, w, h, _) in bboxes]
 
         return faces, Face_im
@@ -50,7 +59,7 @@ class Segmentor:
 
     def YoloSegment(self, image):
         """
-        Use Haar segmentor to get facial images
+        Use YOLO segmentor to get facial images
 
         :return:
         List of arrays: [X, Y, W, H] and list of np arrays of cut images
@@ -65,8 +74,9 @@ class Segmentor:
         blob = cv2.dnn.blobFromImage(image, 1 / 255, (image.shape[0] , image.shape[1]),
                                      [0, 0, 0], 1, crop=False)
 
-
+        print("yolo")
         print(image.shape)
+
 
         # Sets the input to the network
         self.net.setInput(blob)
@@ -75,21 +85,17 @@ class Segmentor:
         outs = self.net.forward(get_outputs_names(self.net))
 
         # Remove the bounding boxes with low confidence
-        faces = post_process(segmentor.frame, outs, CONF_THRESHOLD, NMS_THRESHOLD)
+        faces = post_process(image, outs, CONF_THRESHOLD, NMS_THRESHOLD)
         for (x, y, w, h) in faces:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
-            if(cut_face.all() != None):
+            if(type(cut_face) != None):
                 Face_im.append(cut_face)
 
         print(faces)
         if (len(Face_im) > 0):
             print(Face_im[0].shape)
         return faces, Face_im
-
-
-
-
 
 
     def refined_box(self, left, top, width, height):
@@ -107,9 +113,8 @@ class Segmentor:
 
         return left, top, right, bottom
 
-
+    #initializes Haar classifier
     def HaarInit(self):
-        cascPath = "Segmentor_data/haarcascade_frontalface_default.xml"
         self.faceCascade = cv2.CascadeClassifier(cascPath)
 
 
@@ -131,13 +136,14 @@ class Segmentor:
             minSize=(5, 5)
         )
         for (x, y, w, h) in faces:
-            cut_face = segmentor.frame[y - buff:y + h + buff, x - buff:x + w + buff]
+            cut_face = image[y - buff:y + h + buff, x - buff:x + w + buff]
             cut_face = self.resize(cut_face)
-            if(cut_face.all() != None):
+            if(type(cut_face) != None):
                 Face_im.append(cut_face)
 
         return faces, Face_im
 
+    #resizes input image to the necessary output dimension
     def resize(self, im):
         try:
             assert(im.size != 0)
@@ -157,7 +163,6 @@ class Segmentor:
         pass
 
 
-
 if __name__ == "__main__":
     video_capture = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -166,20 +171,21 @@ if __name__ == "__main__":
     segmentor = Segmentor()
 
     while True:
-        ret, segmentor.frame = video_capture.read()
-        faces, cuts = segmentor.Segment(segmentor.frame)
-
-        if len(cuts) > 0:
-                print("Loading single sample...", end="\r")
-                sample = cuts[0]
+        ret, segmentor.frame = video_capture.read() #read frame from video
+        faces, cuts = segmentor.Segment(segmentor.frame) #detect faces in frame
+        print("Loading sample...", end="\r")
+        print(f"Found {len(cuts)} faces.")
+        for i in range(len(cuts)):
+                sample = cuts[i]
                 print(sample.shape)
                 print("Making single prediction...", end="\r")
                 startTime = time.time()
-                singleResult = model.classify(sample)
+                singleResult = model.classify(sample) #emotional classification
                 predictTime = time.time() - startTime
                 print(f"Processed in {predictTime} seconds.")
                 print(singleResult)
 
+        #draw rectangle around each detected face
         for (x, y, w, h) in faces:
             cv2.rectangle(segmentor.frame, (x - buff, y - buff), (x + w + buff, y + h + buff), (0, 255, 0), 2)
 
