@@ -132,7 +132,6 @@ if __name__ == '__main__':
     dataLoader = create_dataset.DataLoader()
     trainSet = dataLoader.getDataset(num_samples=300, normalize=True)[0] #gives first 30 subjects
     testSet = dataLoader.getDataset(start_index=300, normalize=True)[0] #gives last 6 subjects
-    testSet = testSet.batch(10)
 
     #Apply transformations to expand dataset
     # trainSet = trainSet.repeat(3)
@@ -151,7 +150,8 @@ if __name__ == '__main__':
     #                 for batch in batch_options:
     #                     current_model = generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr, regularizer=reg)
     #                     current_trainSet = trainSet.shuffle(200).batch(batch)
-    #                     history = current_model.fit(current_trainSet, epochs=100, validation_data=testSet)
+    #                     current_testSet = testSet.batch(10)
+    #                     history = current_model.fit(current_trainSet, epochs=100, validation_data=current_testSet)
     #
     #                     fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
     #                     plt.plot(history.history['accuracy'], label="train acc")
@@ -164,21 +164,47 @@ if __name__ == '__main__':
     #                     plt.legend()
     #                     plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
 
+    def reduceSize(dataset):
+        data = []
+        labels = []
+        for image, label in dataset:
+            image = create_dataset.rgb2gray(image)
+            data.append(create_dataset.standardize_image(image, HEIGHT, WIDTH))
+            labels.append(label)
+        return tf.data.Dataset.from_tensor_slices((data, labels))
+
+    trainSet = reduceSize(trainSet)
+    testSet = reduceSize(testSet)
+    testSet = testSet.batch(10)
+
+    stopCallback = keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=15)
+    #If grid search is somehow halted, you can use count to specify a number of hyperparameter
+    #values to skip and resume the search
+    count = 0
+    skip = False
     for layer in layer_options:
         for drop in dropout_options:
             for lr in lr_options:
                 for batch in batch_options:
+                    print(f"cnn2#l{layer}-d{drop}-lr{lr}-b{batch}\n\n")
+                    if skip:
+                        if count != 0:
+                            count = count - 1
+                            continue
+                        else:
+                            skip = False
                     current_model = get_CNN_model(num_conv_layer_groups=layer, dropout=drop, learning_rate=lr)
                     current_trainSet = trainSet.shuffle(200).batch(batch)
-                    history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet)
+                    history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet, callbacks=[stopCallback])
 
                     fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
                     plt.plot(history.history['accuracy'], label="train acc")
                     plt.plot(history.history['val_accuracy'], label="test acc")
                     plt.plot(history.history['top3_acc'], label="train top3")
                     plt.plot(history.history['val_top3_acc'], label="test top3")
-                    plt.title(f"{history.history['val_accuracy'][-1]}% accuracy generalizedSVM: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
+                    plt.title(f"{history.history['val_accuracy'][-1]:.4f}% accuracy cnn2: layers={layer}, dropout={drop}, lr={lr}, batch={batch}")
                     plt.xlabel("epochs")
                     plt.ylabel("accuracy")
                     plt.legend()
-                    plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
+                    plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}cnn2#l{layer}-d{drop}-lr{lr}-b{batch}.png")
+                    plt.close()
