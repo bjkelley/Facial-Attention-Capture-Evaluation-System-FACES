@@ -55,18 +55,41 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
 
 
 ### classifier_definitions.py
-
-### grid_search.py
-
-### evaluate_classifiers.py
-
 Use the `get_CNN()` and `get_generalizedSVM()` functions to define models of each architecture with specified parameters.
 These functions make it easier to perform the Grid-Search and build the best models once determined.
 `get_generalizedSVM()` takes in the following parameters: `input_shape`, `num_conv_layers` determines the number of
  hidden convolutional layers, `dropout` gives the dropout rate after each convolutional layer, `learning_rate`, and
  `regularizer` gives the regularizer hyperparameter. `get_CNN()` takes in the following parameters: `num_conv_layers`
- determines the number of hidden convolutional layer groups (each group has three convolutional layers and a dropout), `dropout` gives the dropout rate after each convolutional layer,
+ determines the number of hidden convolutional layer groups (each group has three convolutional layers and a dropout),
+  `dropout` gives the dropout rate after each convolutional layer,
  and `learning_rate`.
+
+### grid_search.py
+Grid-Searches can be perfomed by defining a list of values for each hyperparameter; the lists can be of different sizes.
+a Grid-Search of a single model type (either 'SVM' or 'CNN') is performed by calling
+`run_grid_search(model_type, layer_options, dropout_options, lr_options, reg_options, batch_options, skip)` where each variation
+of hyperparameters is tested, with the exception of the first `skip` number of models. For each model, the test and train accuracy
+and top three accuracy is saved on a graph and saved in the current folder.
+
+Once the grid search is complete, you can save and compare the results of some of the best performing models. Define a
+list of the same size for each hyperparameter, representing the values for that parameter of the n-best models to be
+compared. Call the evaluation function as follows:
+`evaluate_best_models(model_type, n_best, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)`
+We recommend that you use a large number of epochs so that early-stopping is likely to occur. This ensures that the most
+accurate weights are saved, not just the final weights. All models included will be trained, stored in the trained models folder,
+and have their history of test accuracy stored on one graph for comparison.
+
+### evaluate_classifiers.py
+The function test_model returns average times for prediction of each batch size in the `test_batch_size` list. It also determines accuracy
+on the test set - the 6 people left out of the train set. Just pass the model parameters in as a list, and provide the
+filename of the pre-trained saved model: `test_model(model_name, model_params, test_batch_size)`.
+
+`eval_best_models()` is a predefined function that calls `test_model()` on each of the top eight models found in our
+grid search.
+
+`sample_best_models()` produces sample output of the top 2 models - the best SVM and CNN. It produces a graph with
+several images and the top three predictions from each model.
+![alt text](/figures/svm_samples_4.png){:width="50%"}
 
 
 ## Installation
