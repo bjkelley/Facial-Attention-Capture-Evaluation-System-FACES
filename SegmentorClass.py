@@ -109,7 +109,7 @@ class Segmentor:
 
 
     def HaarInit(self):
-        cascPath = "Segmentor_data/haarcascade_frontalface_default.xml"
+        cascPath = "haarcascade_frontalface_default.xml"
         self.faceCascade = cv2.CascadeClassifier(cascPath)
 
 

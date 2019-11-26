@@ -1,3 +1,13 @@
+'''
+live_video.py
+
+Contains functions for running segmentation and emotion classification on video frames and converting video frames
+to grayscale. When run as main, receives a video feed from the machine's default camera, finds and classifies the faces
+in the video as attentive or inattentive, and marks the faces with boundary boxes and different colors based on the
+classification.
+'''
+
+
 import numpy as np
 import cv2
 from multiprocessing import Queue
@@ -42,7 +52,18 @@ def convertToGrayscale():
 
 
 def segmentAndPredict(model, segmentor, frame, queue):
+    '''
+    Runs segmentation and emotion classification on a given frame, storing the results in queue.
+
+    :param model: a emotion classification model instance
+    :param segmentor: a segmentation model instance
+    :param frame: numpy array representing the image to be processed
+    :param queue: a queue to store the segmentation and prediction results in
+    '''
+    print("Segmenting...")
+    startTime = time.time()
     faces, cuts = segmentor.Segment(frame)
+    print(f"Segmented in {time.time() - startTime} seconds.")
     predictions = []
 
     if len(cuts) > 0:
@@ -54,7 +75,7 @@ def segmentAndPredict(model, segmentor, frame, queue):
             startTime = time.time()
             prediction = model.classify(sample)
             predictTime = time.time() - startTime
-            print(f"Processed in {predictTime} seconds.")
+            print(f"Predicted in {predictTime} seconds.")
             print("PRED: ", prediction[0])
             predictions.append(prediction[0])
     
@@ -64,8 +85,8 @@ def segmentAndPredict(model, segmentor, frame, queue):
 if __name__ == "__main__":
 
     font = cv2.FONT_HERSHEY_SIMPLEX
-    model = ReadyModel()
-    segmentor = Segmentor()
+    model = ReadyModel('generalizedSVM')
+    segmentor = Segmentor('Haar')
     BUFF = 15
 
     IMG_PROCESS_TIME = 0.5
