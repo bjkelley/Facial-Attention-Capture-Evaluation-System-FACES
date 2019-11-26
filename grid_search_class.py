@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import time
 from tensorflow.keras import models
 
-
 # pixel height/width for resizing images
 HEIGHT = WIDTH = 60
 
@@ -21,7 +20,7 @@ def applyTransform(dataset, num_repeat=3):
         randNums = np.random.randint(low=1, high=5, size=num_repeat)
         numsUsed = []
         for num in randNums:
-            if num in numsUsed: num=(num+1)%5 #guarantees samples not used twice
+            if num in numsUsed: num = (num + 1) % 5  # guarantees samples not used twice
             if num == 0:
                 data.append(image)
                 labels.append(label)
@@ -30,12 +29,12 @@ def applyTransform(dataset, num_repeat=3):
                 labels.append(label)
             elif num == 2:
                 newImage = create_dataset.add_speckle(image, 0.05)
-                newImage = np.clip(newImage, a_min=0, a_max=1) #ensures normalization is maintained
+                newImage = np.clip(newImage, a_min=0, a_max=1)  # ensures normalization is maintained
                 data.append(newImage)
                 labels.append(label)
             elif num == 3:
                 newImage = create_dataset.add_gaussian_noise(image, 0, 0.005)
-                newImage = np.clip(newImage, a_min=0, a_max=1) #ensures normalization is maintained
+                newImage = np.clip(newImage, a_min=0, a_max=1)  # ensures normalization is maintained
                 data.append(newImage)
                 labels.append(label)
             elif num == 4:
@@ -53,11 +52,11 @@ def applyTransform(dataset, num_repeat=3):
 
 
 # dropout rate, num conv layers, learning rate, normalize data, batch size, regularizer number
-def generalizedSVM(input_shape=(128,128, 3), num_conv_layers=3, dropout=0.3, learning_rate=0.001, regularizer=0.01):
+def generalizedSVM(input_shape=(128, 128, 3), num_conv_layers=3, dropout=0.3, learning_rate=0.001, regularizer=0.01):
     model = keras.Sequential()
 
     num_filters = 16
-    kernel_size = int(2**num_conv_layers)
+    kernel_size = int(2 ** num_conv_layers)
 
     model.add(layers.Conv2D(filters=num_filters, kernel_size=(kernel_size, kernel_size), strides=1, padding='same',
                             activation="relu", input_shape=input_shape))
@@ -67,7 +66,8 @@ def generalizedSVM(input_shape=(128,128, 3), num_conv_layers=3, dropout=0.3, lea
     kernel_size = int(kernel_size / 2)
 
     for layer in range(0, num_conv_layers - 1):
-        model.add(layers.Conv2D(filters=num_filters, kernel_size=(kernel_size, kernel_size), strides=4, padding='same', activation="relu"))
+        model.add(layers.Conv2D(filters=num_filters, kernel_size=(kernel_size, kernel_size), strides=4, padding='same',
+                                activation="relu"))
         model.add(layers.Dropout(dropout))
         num_filters = num_filters + 8
         kernel_size = int(kernel_size / 2)
@@ -128,14 +128,13 @@ def get_CNN_model(num_conv_layer_groups=3, dropout=0.2, learning_rate=0.001):
 
     return model
 
+
 if __name__ == '__main__':
     dataLoader = create_dataset.DataLoader()
-    trainSet = dataLoader.getDataset(num_samples=300, normalize=True)[0] #gives first 30 subjects
-    testSet = dataLoader.getDataset(start_index=300, normalize=True)[0] #gives last 6 subjects
-    testSet = testSet.batch(10)
+    trainSet = dataLoader.getDataset(num_samples=300, normalize=True)[0]  # gives first 30 subjects
+    testSet = dataLoader.getDataset(start_index=300, normalize=True)[0]  # gives last 6 subjects
 
-    #Apply transformations to expand dataset
-    # trainSet = trainSet.repeat(3)
+    # Apply transformations to expand dataset
     trainSet = applyTransform(trainSet, num_repeat=5)
 
     layer_options = [2, 3, 4]
@@ -145,7 +144,7 @@ if __name__ == '__main__':
     batch_options = [15, 30, 60]
 
     stopCallback = keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=15)
-    count = 250
+    count = 275
     skip = True
 
     for layer in layer_options:
@@ -159,37 +158,67 @@ if __name__ == '__main__':
                                 continue
                             else:
                                 skip = False
-                        current_model = generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr, regularizer=reg)
+                        current_model = generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr,
+                                                       regularizer=reg)
                         current_trainSet = trainSet.shuffle(200).batch(batch)
-                        history = current_model.fit(current_trainSet, epochs=100, validation_data=testSet, callbacks=[stopCallback])
+                        current_testSet = testSet.batch(10)
+                        history = current_model.fit(current_trainSet, epochs=100, validation_data=testSet,
+                                                    callbacks=[stopCallback])
 
                         fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
                         plt.plot(history.history['accuracy'], label="train acc")
                         plt.plot(history.history['val_accuracy'], label="test acc")
                         plt.plot(history.history['top3_acc'], label="train top3")
                         plt.plot(history.history['val_top3_acc'], label="test top3")
-                        plt.title(f"{history.history['val_accuracy'][-1]:.4f}% accuracy generalizedSVM: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
+                        plt.title(
+                            f"{history.history['val_accuracy'][-1]:.4f}% accuracy generalizedSVM: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
                         plt.xlabel("epochs")
                         plt.ylabel("accuracy")
                         plt.legend()
-                        plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
+                        plt.savefig(
+                            f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
                         plt.close()
 
+    # def reduceSize(dataset):
+    #     data = []
+    #     labels = []
+    #     for image, label in dataset:
+    #         image = create_dataset.rgb2gray(image)
+    #         data.append(create_dataset.standardize_image(image, HEIGHT, WIDTH))
+    #         labels.append(label)
+    #     return tf.data.Dataset.from_tensor_slices((data, labels))
+
+    # trainSet = reduceSize(trainSet)
+    # testSet = reduceSize(testSet)
+    # testSet = testSet.batch(10)
+
+    # #If grid search is somehow halted, you can use count to specify a number of hyperparameter
+    # #values to skip and resume the search
+    # count = 0
+    # skip = False
     # for layer in layer_options:
     #     for drop in dropout_options:
     #         for lr in lr_options:
     #             for batch in batch_options:
+    #                 print(f"cnn2#l{layer}-d{drop}-lr{lr}-b{batch}\n\n")
+    #                 if skip:
+    #                     if count != 0:
+    #                         count = count - 1
+    #                         continue
+    #                     else:
+    #                         skip = False
     #                 current_model = get_CNN_model(num_conv_layer_groups=layer, dropout=drop, learning_rate=lr)
     #                 current_trainSet = trainSet.shuffle(200).batch(batch)
-    #                 history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet)
-    #
+    #                 history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet, callbacks=[stopCallback])
+
     #                 fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
     #                 plt.plot(history.history['accuracy'], label="train acc")
     #                 plt.plot(history.history['val_accuracy'], label="test acc")
     #                 plt.plot(history.history['top3_acc'], label="train top3")
     #                 plt.plot(history.history['val_top3_acc'], label="test top3")
-    #                 plt.title(f"{history.history['val_accuracy'][-1]:.4f}% accuracy CNN2: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
+    #                 plt.title(f"{history.history['val_accuracy'][-1]:.4f}% accuracy cnn2: layers={layer}, dropout={drop}, lr={lr}, batch={batch}")
     #                 plt.xlabel("epochs")
     #                 plt.ylabel("accuracy")
     #                 plt.legend()
-    #                 plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}CNN2#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
+    #                 plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}cnn2#l{layer}-d{drop}-lr{lr}-b{batch}.png")
+    #                 plt.close()
