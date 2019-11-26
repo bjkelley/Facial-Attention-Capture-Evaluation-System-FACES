@@ -89,8 +89,8 @@ grid search.
 
 `sample_best_models()` produces sample output of the top 2 models - the best SVM and CNN. It produces a graph with
 several images and the top three predictions from each model.
-![alt text](/figures/svm_samples_4.png){:width="50%"}
-
+![alt text](/figures/svm_samples_4.png =250x)
+![alt text](/figures/cnn_samples_4.png =250x)
 
 
 
