@@ -11,21 +11,17 @@
 * Virtualenv
 
 ## Table of Contents
-- [ECS_171_ML_Measure_Attentiveness](#ecs-171-ml-measure-attentiveness)
-  * [Dependencies](#dependencies)
-  * [Modules](#modules)
-    + [create_dataset.py](#create-datasetpy)
-    + [image_mod_functions.py](#image-mod-functionspy)
-    + [loader_class.py](#loader-classpy)
-    + [train_emotion_classifier.py](#train-emotion-classifierpy)
-    + [classifier_definitions.py](#classifier-definitionspy)
-    + [grid_search.py](#grid-searchpy)
-    + [evaluate_classifiers.py](#evaluate-classifierspy)
-    + [SegmentorClass.py](#segmentorclasspy)
-  * [Installation](#installation)
-    + [Step 1](#step-1)
-    + [Step 2](#step-2)
-    + [Step 3](#step-3)
+- [Dependencies](#dependencies)
+- [Modules](#modules)
+  * [create_dataset.py](#create-datasetpy)
+  * [image_mod_functions.py](#image-mod-functionspy)
+  * [loader_class.py](#loader-classpy)
+  * [train_emotion_classifier.py](#train-emotion-classifierpy)
+  * [classifier_definitions.py](#classifier-definitionspy)
+  * [grid_search.py](#grid-searchpy)
+  * [evaluate_classifiers.py](#evaluate-classifierspy)
+  * [SegmentorClass.py](#segmentorclasspy)
+- [Installation](#installation)
 
 ## Modules
 
