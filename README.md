@@ -13,30 +13,30 @@
 ## Table of Contents
 - [Dependencies](#dependencies)
 - [Modules](#modules)
-  * [create_dataset.py](#create-datasetpy)
-  * [image_mod_functions.py](#image-mod-functionspy)
-  * [loader_class.py](#loader-classpy)
-  * [train_emotion_classifier.py](#train-emotion-classifierpy)
-  * [classifier_definitions.py](#classifier-definitionspy)
-  * [grid_search.py](#grid-searchpy)
-  * [evaluate_classifiers.py](#evaluate-classifierspy)
+  * [create_dataset.py](#createdatasetpy)
+  * [image_mod_functions.py](#imagemodfunctionspy)
+  * [loader_class.py](#loaderclasspy)
+  * [train_emotion_classifier.py](#trainemotionclassifierpy)
+  * [classifier_definitions.py](#classifierdefinitionspy)
+  * [grid_search.py](#gridsearchpy)
+  * [evaluate_classifiers.py](#evaluateclassifierspy)
   * [SegmentorClass.py](#segmentorclasspy)
 - [Installation](#installation)
 
 ## Modules
 
-### create_dataset.py
+### CreateDataset.py
 The focus of this module is to create a tensorflow dataset object of labeled images from a folder organization. The "getDataset" function does exactly this by globbing through the folder hierarchy in sorted order and returning the dataset. It is important to note that the "getDataset" function as well normalizes the images to float on [0,1] and converts them to greyscale. Ultimately the "getDataset" functions returns this normalized, greyscale, tensorflow dataset object of the images acquired from the FacesDB dataset used for this project.
 
-### image_mod_functions.py
+### ImageModFunctions.py
 A suite of functions to manipulate numpy image matrices. Manipulations include rotation, additive gaussian noise, speckle, up and down sampling, size standardization, to gray scale.
 
-### loader_class.py
+### LoaderClass.py
 To load a pretrained model, create a new **ReadyModel** object with the name of the model you wish to use. To make a prediction, call ```results = ReadyModel.classify(batch, k_most_confident_classes=3)``` where batch is either a numpy array with images of shape ```(batch_size, height, width, num_channels)``` or simply  ```(height, width, num_channels)```. ```results``` will contain list where each element is a list with length ```k_most_confident_classes``` and whose inner elements are tuples of ```(probability, emotion_string)```. The default behavior uses the "cnn2" model and returns the 3 most confident classes.
 
 *```ReadyModel.preprocess()``` is called by ```ReadyModel.classify()```, and expects a square-image input with a face already isolated. It may convert the image to grayscale, and resizes as neccessary for the model_type selected (the most accurate CNN model, 'cnn2', will grayscale and resize inputs to (60, 60, 1)).*
 
-### train_emotion_classifier.py
+### TrainEmotionClassifier.py
 
 - this module trains and outputs a keras model (weights, optimizer state, and architecture), as well as provides evaluation plots (loss, accuracy, and top3 accuracy for train/test splits).
 
@@ -67,7 +67,7 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
         - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture.
 
 
-### classifier_definitions.py
+### ClassifierDefinitions.py
 Use the `get_CNN()` and `get_generalizedSVM()` functions to define models of each architecture with specified parameters.
 These functions make it easier to perform the Grid-Search and build the best models once determined.
 `get_generalizedSVM()` takes in the following parameters: `input_shape`, `num_conv_layers` determines the number of
@@ -77,7 +77,7 @@ These functions make it easier to perform the Grid-Search and build the best mod
   `dropout` gives the dropout rate after each convolutional layer,
  and `learning_rate`.
 
-### grid_search.py
+### GridSearch.py
 Grid-Searches can be perfomed by defining a list of values for each hyperparameter; the lists can be of different sizes.
 a Grid-Search of a single model type (either 'SVM' or 'CNN') is performed by calling
 `run_grid_search(model_type, layer_options, dropout_options, lr_options, reg_options, batch_options, skip)` where each variation
@@ -95,7 +95,7 @@ and have their history of test accuracy stored on one graph for comparison.
 ![best 8 model accuracy over time](/figures/Best_8.png)
 
 
-### evaluate_classifiers.py
+### EvaluateClassifiers.py
 The function test_model returns average times for prediction of each batch size in the `test_batch_size` list. It also determines accuracy
 on the test set - the 6 people left out of the train set. Just pass the model parameters in as a list, and provide the
 filename of the pre-trained saved model: `test_model(model_name, model_params, test_batch_size)`.
