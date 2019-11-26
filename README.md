@@ -79,6 +79,9 @@ We recommend that you use a large number of epochs so that early-stopping is lik
 accurate weights are saved, not just the final weights. All models included will be trained, stored in the trained models folder,
 and have their history of test accuracy stored on one graph for comparison.
 
+![best 8 model accuracy over time](/figures/best_8.png)
+
+
 ### evaluate_classifiers.py
 The function test_model returns average times for prediction of each batch size in the `test_batch_size` list. It also determines accuracy
 on the test set - the 6 people left out of the train set. Just pass the model parameters in as a list, and provide the
@@ -89,8 +92,9 @@ grid search.
 
 `sample_best_models()` produces sample output of the top 2 models - the best SVM and CNN. It produces a graph with
 several images and the top three predictions from each model.
-![alt text](/figures/all_samples_4.png)
-In the figure above, the left 3 columns demonstrate the best SVM predictions and the right 3 columns are the best CNN predictions.
+In the figure below, the left 3 columns demonstrate the best SVM predictions and the right 3 columns are the best CNN predictions.
+
+![best 2 model sample predictions](/figures/all_samples_4.png)
 
 
  ### SegmentorClass.py
