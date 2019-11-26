@@ -52,7 +52,8 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
      6) **saving tensorflow.keras model):**
         - saved model into models/ directory, using **model.save(*path*)**
         - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture.
-       
+
+
 ### classifier_definitions.py
 
 ### grid_search.py
