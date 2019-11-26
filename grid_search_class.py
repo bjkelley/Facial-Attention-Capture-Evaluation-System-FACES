@@ -144,41 +144,52 @@ if __name__ == '__main__':
     reg_options = [1, 0.1, 0.01]
     batch_options = [15, 30, 60]
 
-    # for layer in layer_options:
-    #     for drop in dropout_options:
-    #         for lr in lr_options:
-    #             for reg in reg_options:
-    #                 for batch in batch_options:
-    #                     current_model = generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr, regularizer=reg)
-    #                     current_trainSet = trainSet.shuffle(200).batch(batch)
-    #                     history = current_model.fit(current_trainSet, epochs=100, validation_data=testSet)
-    #
-    #                     fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
-    #                     plt.plot(history.history['accuracy'], label="train acc")
-    #                     plt.plot(history.history['val_accuracy'], label="test acc")
-    #                     plt.plot(history.history['top3_acc'], label="train top3")
-    #                     plt.plot(history.history['val_top3_acc'], label="test top3")
-    #                     plt.title(f"{history.history['val_accuracy'][-1]}% accuracy generalizedSVM: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
-    #                     plt.xlabel("epochs")
-    #                     plt.ylabel("accuracy")
-    #                     plt.legend()
-    #                     plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
+    stopCallback = keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=15)
+    count = 250
+    skip = True
 
     for layer in layer_options:
         for drop in dropout_options:
             for lr in lr_options:
-                for batch in batch_options:
-                    current_model = get_CNN_model(num_conv_layer_groups=layer, dropout=drop, learning_rate=lr)
-                    current_trainSet = trainSet.shuffle(200).batch(batch)
-                    history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet)
+                for reg in reg_options:
+                    for batch in batch_options:
+                        if skip:
+                            if count != 0:
+                                count = count - 1
+                                continue
+                            else:
+                                skip = False
+                        current_model = generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr, regularizer=reg)
+                        current_trainSet = trainSet.shuffle(200).batch(batch)
+                        history = current_model.fit(current_trainSet, epochs=100, validation_data=testSet, callbacks=[stopCallback])
 
-                    fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
-                    plt.plot(history.history['accuracy'], label="train acc")
-                    plt.plot(history.history['val_accuracy'], label="test acc")
-                    plt.plot(history.history['top3_acc'], label="train top3")
-                    plt.plot(history.history['val_top3_acc'], label="test top3")
-                    plt.title(f"{history.history['val_accuracy'][-1]}% accuracy generalizedSVM: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
-                    plt.xlabel("epochs")
-                    plt.ylabel("accuracy")
-                    plt.legend()
-                    plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
+                        fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
+                        plt.plot(history.history['accuracy'], label="train acc")
+                        plt.plot(history.history['val_accuracy'], label="test acc")
+                        plt.plot(history.history['top3_acc'], label="train top3")
+                        plt.plot(history.history['val_top3_acc'], label="test top3")
+                        plt.title(f"{history.history['val_accuracy'][-1]:.4f}% accuracy generalizedSVM: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
+                        plt.xlabel("epochs")
+                        plt.ylabel("accuracy")
+                        plt.legend()
+                        plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}GeneralizedSVM#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
+                        plt.close()
+
+    # for layer in layer_options:
+    #     for drop in dropout_options:
+    #         for lr in lr_options:
+    #             for batch in batch_options:
+    #                 current_model = get_CNN_model(num_conv_layer_groups=layer, dropout=drop, learning_rate=lr)
+    #                 current_trainSet = trainSet.shuffle(200).batch(batch)
+    #                 history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet)
+    #
+    #                 fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
+    #                 plt.plot(history.history['accuracy'], label="train acc")
+    #                 plt.plot(history.history['val_accuracy'], label="test acc")
+    #                 plt.plot(history.history['top3_acc'], label="train top3")
+    #                 plt.plot(history.history['val_top3_acc'], label="test top3")
+    #                 plt.title(f"{history.history['val_accuracy'][-1]:.4f}% accuracy CNN2: layers={layer}, dropout={drop}, lr={lr}, reg={reg}, batch={batch}")
+    #                 plt.xlabel("epochs")
+    #                 plt.ylabel("accuracy")
+    #                 plt.legend()
+    #                 plt.savefig(f"./figures/{history.history['val_accuracy'][-1]:.4f}CNN2#l{layer}-d{drop}-lr{lr}-r{reg}-b{batch}.png")
