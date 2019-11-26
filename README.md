@@ -89,9 +89,8 @@ grid search.
 
 `sample_best_models()` produces sample output of the top 2 models - the best SVM and CNN. It produces a graph with
 several images and the top three predictions from each model.
-![alt text](/figures/svm_samples_4.png =250x)
-![alt text](/figures/cnn_samples_4.png =250x)
-
+![alt text](/figures/all_samples_4.png)
+In the figure above, the left 3 columns demonstrate the best SVM predictions and the right 3 columns are the best CNN predictions.
 
 
  ### SegmentorClass.py
