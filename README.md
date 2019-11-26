@@ -79,7 +79,7 @@ We recommend that you use a large number of epochs so that early-stopping is lik
 accurate weights are saved, not just the final weights. All models included will be trained, stored in the trained models folder,
 and have their history of test accuracy stored on one graph for comparison.
 
-![best 8 model accuracy over time](/figures/best_8.png)
+![best 8 model accuracy over time](/figures/Best_8.png)
 
 
 ### evaluate_classifiers.py
