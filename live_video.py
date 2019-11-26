@@ -10,15 +10,15 @@ INATTENTIVE_COLOR = (0, 0, 255) # Red
 
 EMOTION_COLORS = {  # BGR Values
     'neutral frontal': INATTENTIVE_COLOR,
-	'joy': ATTENTIVE_COLOR,
-	'sadness': INATTENTIVE_COLOR,
-	'surprise': ATTENTIVE_COLOR,
-	'anger': INATTENTIVE_COLOR,
-	'disgust': INATTENTIVE_COLOR,
-	'fear': INATTENTIVE_COLOR,
-	'opened': ATTENTIVE_COLOR,
+    'joy': ATTENTIVE_COLOR,
+    'sadness': INATTENTIVE_COLOR,
+    'surprise': ATTENTIVE_COLOR,
+    'anger': INATTENTIVE_COLOR,
+    'disgust': INATTENTIVE_COLOR,
+    'fear': INATTENTIVE_COLOR,
+    'opened': ATTENTIVE_COLOR,
     'closed': INATTENTIVE_COLOR,
-	'kiss': ATTENTIVE_COLOR
+    'kiss': ATTENTIVE_COLOR
 }
 
 def convertToGrayscale():
@@ -41,7 +41,7 @@ def convertToGrayscale():
     cv2.destroyAllWindows()
 
 
-def segmentAndPredict(segmentor, frame, queue):
+def segmentAndPredict(model, segmentor, frame, queue):
     faces, cuts = segmentor.Segment(frame)
     predictions = []
 
@@ -61,13 +61,14 @@ def segmentAndPredict(segmentor, frame, queue):
     queue.put(faces)
     queue.put(predictions)
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
+
     font = cv2.FONT_HERSHEY_SIMPLEX
-    model = ReadyModel('generalizedSVM')
-    segmentor = Segmentor('Yolo')
+    model = ReadyModel()
+    segmentor = Segmentor()
     BUFF = 15
 
-    IMG_PROCESS_TIME = 2.5
+    IMG_PROCESS_TIME = 0.5
     thread = None
     faces = []
     resultsQueue = Queue()
@@ -79,13 +80,13 @@ if __name__ == "__main__":
         ret, frame = video_capture.read()
 
         if time.time() - lastImageProcess > IMG_PROCESS_TIME:    # Update image segmentation and emotional classification at a constant rate
-            if (thread):
+            if thread:
                 thread.join()   # Make sure image processing has finished and get results
                 faces = resultsQueue.get()
                 predictions = resultsQueue.get()
 
             lastImageProcess = time.time()
-            thread = Thread(target=segmentAndPredict, args=(segmentor, frame, resultsQueue), daemon=True) # Start new image processing
+            thread = Thread(target=segmentAndPredict, args=(model, segmentor, frame, resultsQueue), daemon=True) # Start new image processing
             thread.start()
 
         for i in range(0, len(faces)):
