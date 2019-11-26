@@ -7,7 +7,7 @@
 * matplotlib
 * Pillow 6.2.1
 * Tensorflow 2.0+
-* opencv-python (4.1.1.26) 
+* opencv-python (4.1.1.26)
 * Virtualenv
 
 ## Modules
@@ -38,7 +38,7 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
         - downsize all images (used 60x60 pixels) for input to a convolutional neural network
         - apply rest of transformations (add gaussian noise, random rotation)
     3) **create training/testing split, and bootstrap dataset:
-        - our data set only had 36 unique faces, and 10 emotions per each face, so 360 faces total. to create an accurate training pipeline, we split up the training data to have 28 of the faces (280 images), then bootstrapped this training set by applying image augmentations 4 more times, resulting in 1,400 images in the training set. the validation set had 80 images, and none of the people in the testing set were present in the training set. 
+        - our data set only had 36 unique faces, and 10 emotions per each face, so 360 faces total. to create an accurate training pipeline, we split up the training data to have 28 of the faces (280 images), then bootstrapped this training set by applying image augmentations 4 more times, resulting in 1,400 images in the training set. the validation set had 80 images, and none of the people in the testing set were present in the training set.
         - this decreased accuracy in our validation pipeline, but helps us generalize our model to new people
     4) **train convolutional neural network:**
         - using tensorflow's keras API, we trained a CNN (also tried numerous SVM models) over epochs and kept track of the following metrics over the training epochs:
@@ -48,7 +48,7 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
      5) **plotting evaluation figures:**
         - evaluation figures can be found in figures/ directory
         - model CNN2 performed best (as of now) and should be used for further testing
-        
+
      6) **saving tensorflow.keras model):**
         - saved model into models/ directory, using **model.save(*path*)**
         - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture.
@@ -67,6 +67,15 @@ These functions make it easier to perform the Grid-Search and build the best mod
  `regularizer` gives the regularizer hyperparameter. `get_CNN()` takes in the following parameters: `num_conv_layers`
  determines the number of hidden convolutional layer groups (each group has three convolutional layers and a dropout), `dropout` gives the dropout rate after each convolutional layer,
  and `learning_rate`.
+
+
+
+
+ ### SegmentorClass.py
+
+ Contains driver code for each of the three models we used. Each model has a specific `init` function and `segment`
+ function to return the bounding box coordinates along with an array of the resized faces to feed into the emotional classification models.
+ The model functions are predetermined when initializing the `Segmentor` class where it takes in the parameter of `impl` which you can define to be one of the three models "Haar", "Yolo", or "faced". You can then use the `Segmentor` instance to call the `segment(frame)` method which takes in a numpy array representing the image to be processed.
 
 
 ## Installation
@@ -88,7 +97,7 @@ or for windows:
 
     virtualenv -p python3.7 venv
     venv/Scripts/activate
-    
+
 *troubleshooting:* Machines with multiple versions of python will have multiple names for each version. If ```-p python3.7``` doesn't work, you can replace with ```-p python3``` or even ```-p python```. Once your virtual environment is active, type ```python --version``` to ensure that you are using python 3.7.5
 
 ### Step 3
