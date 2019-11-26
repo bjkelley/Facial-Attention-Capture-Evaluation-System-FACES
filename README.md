@@ -53,6 +53,19 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
         - saved model into models/ directory, using **model.save(*path*)**
         - using keras model.load_model(*path*), you can load in the exact state of the saved model, which includes the current optimizer state, the weights, and the architecture.
        
+### classifier_definitions.py
+
+### grid_search.py
+
+### evaluate_classifiers.py
+
+Use the `get_CNN()` and `get_generalizedSVM()` functions to define models of each architecture with specified parameters.
+These functions make it easier to perform the Grid-Search and build the best models once determined.
+`get_generalizedSVM()` takes in the following parameters: `input_shape`, `num_conv_layers` determines the number of
+ hidden convolutional layers, `dropout` gives the dropout rate after each convolutional layer, `learning_rate`, and
+ `regularizer` gives the regularizer hyperparameter. `get_CNN()` takes in the following parameters: `num_conv_layers`
+ determines the number of hidden convolutional layer groups (each group has three convolutional layers and a dropout), `dropout` gives the dropout rate after each convolutional layer,
+ and `learning_rate`.
 
 
 ## Installation

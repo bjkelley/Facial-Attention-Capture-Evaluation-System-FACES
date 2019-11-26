@@ -36,6 +36,13 @@ class ReadyModel():
 			self.input_shape=(128,128,3)
 			self.normalize = True
 			self.model = keras.models.load_model('trained_models/generalizedSVM.h5', custom_objects=dependencies)
+		elif self.model_type == "bestsvm":
+			self.input_shape=(128,128,3)
+			self.normalize = True
+			self.model = keras.models.load_model('trained_models/BestSVM.h5', custom_objects=dependencies)
+		elif self.model_type == "bestcnn":
+			self.gray = True
+			self.model = keras.models.load_model('trained_models/BestCNN.h5', custom_objects=dependencies)
 		elif self.model_type == "fastsvm":
 			self.normalize = True
 			self.input_shape=(128,128,3)

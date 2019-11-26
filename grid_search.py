@@ -159,15 +159,15 @@ def evaluate_best_models(model_type, num_models, layers, dropouts, lrs, regs, ba
 
 if __name__ == '__main__':
     # perform a grid search
-    # layer_options = [2, 3, 4]
-    # dropout_options = [0.2, 0.3, 0.4, 0.5]
-    # lr_options = [0.1, 0.01, 0.001]
-    # reg_options = [1, 0.1, 0.01]
-    # batch_options = [15, 30, 60]
-    # skip = 226
-    #
-    # run_grid_search('svm', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
-    # # run_grid_search('cnn', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
+    layer_options = [2, 3, 4]
+    dropout_options = [0.2, 0.3, 0.4, 0.5]
+    lr_options = [0.1, 0.01, 0.001]
+    reg_options = [1, 0.1, 0.01]
+    batch_options = [15, 30, 60]
+    skip = 236
+
+    run_grid_search('svm', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
+    # run_grid_search('cnn', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
 
     # compare the best models
     # layer_options = [2, 2, 2, 2]
@@ -178,11 +178,11 @@ if __name__ == '__main__':
     #
     # evaluate_best_models('CNN', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
 
-    layer_options = [3, 3, 3, 3]
-    dropout_options = [0.2, 0.4, 0.5, 0.3]
-    lr_options = [0.001, 0.001, 0.001, 0.001]
-    reg_options = [0.1, 0.01, 0.01, 0.1]
-    batch_options = [30, 30, 60, 60]
-
-    evaluate_best_models('SVM', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
+    # layer_options = [3, 3, 3, 3]
+    # dropout_options = [0.2, 0.4, 0.5, 0.3]
+    # lr_options = [0.001, 0.001, 0.001, 0.001]
+    # reg_options = [0.1, 0.01, 0.01, 0.1]
+    # batch_options = [30, 30, 60, 60]
+    #
+    # evaluate_best_models('SVM', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
 
