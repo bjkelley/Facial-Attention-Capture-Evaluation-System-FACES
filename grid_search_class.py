@@ -146,6 +146,7 @@ if __name__ == '__main__':
     count = 275
     skip = True
 
+    svm_testSet = testSet.batch(10)
     for layer in layer_options:
         for drop in dropout_options:
             for lr in lr_options:
@@ -159,8 +160,7 @@ if __name__ == '__main__':
                                 skip = False
                         current_model = generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr, regularizer=reg)
                         current_trainSet = trainSet.shuffle(200).batch(batch)
-                        current_testSet = testSet.batch(10)
-                        history = current_model.fit(current_trainSet, epochs=100, validation_data=testSet, callbacks=[stopCallback])
+                        history = current_model.fit(current_trainSet, epochs=100, validation_data=svm_testSet, callbacks=[stopCallback])
 
                         fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
                         plt.plot(history.history['accuracy'], label="train acc")
