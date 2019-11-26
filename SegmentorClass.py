@@ -93,8 +93,8 @@ class Segmentor:
                 Face_im.append(cut_face)
 
         print(faces)
-        if (len(Face_im) > 0):
-            print(Face_im[0].shape)
+        # if (len(Face_im) > 0):
+        #     print(Face_im[0].shape)
         return faces, Face_im
 
 

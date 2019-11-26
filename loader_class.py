@@ -31,7 +31,7 @@ class ReadyModel():
 			self.model = keras.models.load_model('trained_models/cnn2.h5', custom_objects=dependencies)
 		elif self.model_type == "cnn1":
 			self.gray = True
-			self.model = keras.models.load_model('trained_models/cnn1.h5', custom_objects=dependencies)
+			self.model = keras.models.load_model('trained_models/cnn.h5', custom_objects=dependencies)
 		elif self.model_type == "generalizedsvm":
 			self.input_shape=(128,128,3)
 			self.normalize = True
