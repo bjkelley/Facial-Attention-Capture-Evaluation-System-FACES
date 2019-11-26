@@ -1,5 +1,19 @@
 # ECS_171_ML_Measure_Attentiveness
 
+## Table of Contents
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+- [FACES Live Demo](#faces-live-demo)
+- [Modules](#modules)
+  * [create_dataset.py](#createdatasetpy)
+  * [image_mod_functions.py](#imagemodfunctionspy)
+  * [loader_class.py](#loaderclasspy)
+  * [train_emotion_classifier.py](#trainemotionclassifierpy)
+  * [classifier_definitions.py](#classifierdefinitionspy)
+  * [grid_search.py](#gridsearchpy)
+  * [evaluate_classifiers.py](#evaluateclassifierspy)
+  * [SegmentorClass.py](#segmentorclasspy)
+
 ## Dependencies
 * Python 3.75+
 * Numpy 1.17.4
@@ -10,18 +24,37 @@
 * opencv-python (4.1.1.26)
 * Virtualenv
 
-## Table of Contents
-- [Dependencies](#dependencies)
-- [Modules](#modules)
-  * [create_dataset.py](#createdatasetpy)
-  * [image_mod_functions.py](#imagemodfunctionspy)
-  * [loader_class.py](#loaderclasspy)
-  * [train_emotion_classifier.py](#trainemotionclassifierpy)
-  * [classifier_definitions.py](#classifierdefinitionspy)
-  * [grid_search.py](#gridsearchpy)
-  * [evaluate_classifiers.py](#evaluateclassifierspy)
-  * [SegmentorClass.py](#segmentorclasspy)
-- [Installation](#installation)
+## Installation
+*Note:* This install process assumes you have already installed python**3.7.5**. Visit [here](https://www.python.org/downloads/release/python-375/) to download. Virtualenv can also be installed with ```pip install virtualenv```.
+### Step 1
+Clone our repository using:
+
+    git clone https://github.com/bjkelley/ECS_171_ML_Measure_Attentiveness.git
+
+### Step 2
+Make a new directory to contain the project files; create a virtual environment to manage installed packages and activate it.
+
+for linux or mac:
+
+    virtualenv -p python3.7 venv
+    source venv/bin/activate
+
+or for windows:
+
+    virtualenv -p python3.7 venv
+    venv/Scripts/activate
+
+*troubleshooting:* Machines with multiple versions of python will have multiple names for each version. If ```-p python3.7``` doesn't work, you can replace with ```-p python3``` or even ```-p python```. Once your virtual environment is active, type ```python --version``` to ensure that you are using python 3.7.5
+
+### Step 3
+Download dependencies using:
+
+    pip install -r requirements.txt
+   
+## FACES Live Demo
+The live video demo can be run using the following command:
+
+    python .\live_video.py
 
 ## Modules
 
@@ -115,31 +148,3 @@ In the figure below, the left 3 columns demonstrate the best SVM predictions and
  Contains driver code for each of the three models we used. Each model has a specific `init` function and `segment`
  function to return the bounding box coordinates along with an array of the resized faces to feed into the emotional classification models.
  The model functions are predetermined when initializing the `Segmentor` class where it takes in the parameter of `impl` which you can define to be one of the three models "Haar", "Yolo", or "faced". You can then use the `Segmentor` instance to call the `segment(frame)` method which takes in a numpy array representing the image to be processed.
-
-
-## Installation
-*Note:* This install process assumes you have already installed python**3.7.5**. Visit [here](https://www.python.org/downloads/release/python-375/) to download. Virtualenv can also be installed with ```pip install virtualenv```.
-### Step 1
-Clone our repository using:
-
-    git clone https://github.com/bjkelley/ECS_171_ML_Measure_Attentiveness.git
-
-### Step 2
-Make a new directory to contain the project files; create a virtual environment to manage installed packages and activate it.
-
-for linux or mac:
-
-    virtualenv -p python3.7 venv
-    source venv/bin/activate
-
-or for windows:
-
-    virtualenv -p python3.7 venv
-    venv/Scripts/activate
-
-*troubleshooting:* Machines with multiple versions of python will have multiple names for each version. If ```-p python3.7``` doesn't work, you can replace with ```-p python3``` or even ```-p python```. Once your virtual environment is active, type ```python --version``` to ensure that you are using python 3.7.5
-
-### Step 3
-Download dependencies using:
-
-    pip install -r requirements.txt
