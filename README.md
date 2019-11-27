@@ -83,7 +83,7 @@ To load a pretrained model, create a new **ReadyModel** object with the name of 
         - change to grayscale (done in the OpenCV face detection step)
         - downsize all images (used 60x60 pixels) for input to a convolutional neural network
         - apply rest of transformations (add gaussian noise, random rotation)
-    3) **create training/testing split, and bootstrap dataset:
+    3) **create training/testing split, and bootstrap dataset**:
         - our data set only had 36 unique faces, and 10 emotions per each face, so 360 faces total. to create an accurate training pipeline, we split up the training data to have 28 of the faces (280 images), then bootstrapped this training set by applying image augmentations 4 more times, resulting in 1,400 images in the training set. the validation set had 80 images, and none of the people in the testing set were present in the training set.
         - this decreased accuracy in our validation pipeline, but helps us generalize our model to new people
     4) **train convolutional neural network:**
