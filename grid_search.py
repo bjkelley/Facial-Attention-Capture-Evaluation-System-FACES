@@ -7,6 +7,7 @@ from tensorflow import keras
 colors = ['b', 'g', 'r', 'c', 'm', 'y']
 
 
+# takes in lists of model parameters to train models over time
 def run_grid_search(model_name, layer_options, dropout_options, lr_options, reg_options, batch_options, skip_num):
     dataLoader = create_dataset.DataLoader()
     trainSet = dataLoader.getDataset(num_samples=300, normalize=True)[0]  # gives first 30 subjects
@@ -20,6 +21,7 @@ def run_grid_search(model_name, layer_options, dropout_options, lr_options, reg_
     count = skip_num
     skip = True
 
+    # stop early to avoid wasting time on failing models
     stopCallback = keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=15)
 
     if model_name == 'svm':
@@ -35,13 +37,17 @@ def run_grid_search(model_name, layer_options, dropout_options, lr_options, reg_
                                 else:
                                     skip = False
 
+                            # define the model
                             current_model = classifier_definitions.get_generalizedSVM(num_conv_layers=layer, dropout=drop, learning_rate=lr,
                                                            regularizer=reg)
                             current_trainSet = trainSet.shuffle(200).batch(batch)
                             current_testSet = testSet.batch(batch)
+                            # train the model
                             history = current_model.fit(current_trainSet, epochs=100, validation_data=current_testSet,
                                                         callbacks=[stopCallback])
 
+                            # plot the test/train accuracy and top 3 accuracy over time
+                            # models are named starting with their accuracy, they can be easily organized by success in the folder
                             fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
                             plt.plot(history.history['accuracy'], label="train acc")
                             plt.plot(history.history['val_accuracy'], label="test acc")
@@ -72,10 +78,13 @@ def run_grid_search(model_name, layer_options, dropout_options, lr_options, reg_
                                 continue
                             else:
                                 skip = False
+                        # define the model
                         current_model = classifier_definitions.get_CNN(num_conv_layer_groups=layer, dropout=drop, learning_rate=lr)
                         current_trainSet = trainSet.shuffle(200).batch(batch)
+                        # train the model over time
                         history = current_model.fit(current_trainSet, epochs=65, validation_data=testSet, callbacks=[stopCallback])
 
+                        # plot accuracy over time
                         fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
                         plt.plot(history.history['accuracy'], label="train acc")
                         plt.plot(history.history['val_accuracy'], label="test acc")
@@ -89,15 +98,18 @@ def run_grid_search(model_name, layer_options, dropout_options, lr_options, reg_
                         plt.close()
 
 
+# saves best models to memory and compares history of accuracy between each model on one graph
 def evaluate_best_models(model_type, num_models, layers, dropouts, lrs, regs, batches, epochs, patience):
+    # create a new figure
     fig = plt.figure(figsize=(10.8, 7.2), dpi=100)
     plt.title(f"{num_models} Most Accurate {model_type}'s")
     plt.xlabel("epochs")
     plt.ylabel("accuracy")
 
+    # define early stopping to save time
+    # best weights are kept in favor of final weights
     stopCallback = keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=patience, restore_best_weights=True)
 
-    # retest the model
     dataLoader = create_dataset.DataLoader()
     trainSet = dataLoader.getDataset(num_samples=300, normalize=True)[0]  # gives first 30 subjects
     testSet = dataLoader.getDataset(start_index=300, normalize=True)[0]  # gives last 6 subjects
@@ -106,6 +118,7 @@ def evaluate_best_models(model_type, num_models, layers, dropouts, lrs, regs, ba
     trainSet = classifier_definitions.applyTransform(trainSet, num_repeat=5)
 
     if model_type == 'CNN':
+        # alter the size of the data to work with CNN
         trainSet = classifier_definitions.reduceSize(trainSet)
         testSet = classifier_definitions.reduceSize(testSet)
 
@@ -118,10 +131,11 @@ def evaluate_best_models(model_type, num_models, layers, dropouts, lrs, regs, ba
         batch = batches[i]
 
         if model_type == 'CNN':
+            # define the model
             current_model = classifier_definitions.get_CNN(num_conv_layer_groups=layer, dropout=drop, learning_rate=lr)
             current_trainSet = trainSet.shuffle(200).batch(batch)
+            # train the model on the training set
             history = current_model.fit(current_trainSet, epochs=epochs, validation_data=testSet, callbacks=[stopCallback])
-
             # save the model with the highest accuracy weights
 
             # add to the plot
@@ -134,11 +148,13 @@ def evaluate_best_models(model_type, num_models, layers, dropouts, lrs, regs, ba
         elif model_type == "SVM":
             reg = regs[i]
 
+            # define the model
             current_model = classifier_definitions.get_generalizedSVM(num_conv_layers=layer, dropout=drop,
                                                                       learning_rate=lr,
                                                                       regularizer=reg)
             current_trainSet = trainSet.shuffle(200).batch(batch)
             current_testSet = testSet.batch(10)
+            # train the model
             history = current_model.fit(current_trainSet, epochs=epochs, validation_data=testSet,
                                         callbacks=[stopCallback])
 
@@ -152,6 +168,7 @@ def evaluate_best_models(model_type, num_models, layers, dropouts, lrs, regs, ba
         else:
             return
 
+    # once all models history have been plotted, save the plot
     plt.legend()
     plt.savefig(f"./figures/Best {num_models} {model_type}'s.png")
     plt.close()
@@ -167,22 +184,22 @@ if __name__ == '__main__':
     skip = 236
 
     run_grid_search('svm', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
-    # run_grid_search('cnn', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
+    run_grid_search('cnn', layer_options, dropout_options, lr_options, reg_options, batch_options, skip)
 
     # compare the best models
-    # layer_options = [2, 2, 2, 2]
-    # dropout_options = [0.2, 0.4, 0.3, 0.5]
-    # lr_options = [0.001, 0.001, 0.001, 0.001]
-    # reg_options = [0.1, 0.01]
-    # batch_options = [60, 60, 60, 60]
-    #
-    # evaluate_best_models('CNN', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
+    layer_options = [2, 2, 2, 2]
+    dropout_options = [0.2, 0.4, 0.3, 0.5]
+    lr_options = [0.001, 0.001, 0.001, 0.001]
+    reg_options = [0.1, 0.01]
+    batch_options = [60, 60, 60, 60]
 
-    # layer_options = [3, 3, 3, 3]
-    # dropout_options = [0.2, 0.4, 0.5, 0.3]
-    # lr_options = [0.001, 0.001, 0.001, 0.001]
-    # reg_options = [0.1, 0.01, 0.01, 0.1]
-    # batch_options = [30, 30, 60, 60]
-    #
-    # evaluate_best_models('SVM', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
+    evaluate_best_models('CNN', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
+
+    layer_options = [3, 3, 3, 3]
+    dropout_options = [0.2, 0.4, 0.5, 0.3]
+    lr_options = [0.001, 0.001, 0.001, 0.001]
+    reg_options = [0.1, 0.01, 0.01, 0.1]
+    batch_options = [30, 30, 60, 60]
+
+    evaluate_best_models('SVM', 4, layer_options, dropout_options, lr_options, reg_options, batch_options, epochs=200, patience=20)
 

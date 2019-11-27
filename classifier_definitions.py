@@ -48,6 +48,7 @@ def applyTransform(dataset, num_repeat=3):
     return tf.data.Dataset.from_tensor_slices((data, labels))
 
 
+# define an SVM with the given parameters
 # dropout rate, num conv layers, learning rate, normalize data, batch size, regularizer number
 def get_generalizedSVM(input_shape=(128, 128, 3), num_conv_layers=3, dropout=0.3, learning_rate=0.001, regularizer=0.01):
     model = keras.Sequential()
@@ -73,6 +74,7 @@ def get_generalizedSVM(input_shape=(128, 128, 3), num_conv_layers=3, dropout=0.3
     model.add(layers.Dense(10, kernel_regularizer=keras.regularizers.l2(regularizer)))
     model.add(layers.Activation('softmax'))
 
+    # keep track of the top 3 accuracy
     top3_acc = functools.partial(keras.metrics.top_k_categorical_accuracy, k=3)
     top3_acc.__name__ = "top3_acc"
 
@@ -84,6 +86,7 @@ def get_generalizedSVM(input_shape=(128, 128, 3), num_conv_layers=3, dropout=0.3
     return model
 
 
+# define a CNN model with the given parameters
 def get_CNN(num_conv_layer_groups=3, dropout=0.2, learning_rate=0.001):
     model = models.Sequential()
 
