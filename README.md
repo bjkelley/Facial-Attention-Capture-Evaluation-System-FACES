@@ -56,6 +56,10 @@ The live video demo can be run using the following command:
 
     python .\live_video.py
 
+Expected behavior: the script receives a video feed from the machine's default camera, finds and classifies the faces
+in the video as attentive or inattentive, marks the faces with boundary boxes and different colors based on the
+classification, and displays the processed video.
+
 ## Modules
 
 ### CreateDataset.py

@@ -69,14 +69,16 @@ def segmentAndPredict(model, segmentor, frame, queue):
     if len(cuts) > 0:
         print("Loading samples...", end="\r")
         for sample in cuts:
-            
-            print(sample.shape)
+
+            if sample is None:  # avoid Nonetype errors
+                return
+
             print("Making single prediction...", end="\r")
             startTime = time.time()
             prediction = model.classify(sample)
             predictTime = time.time() - startTime
             print(f"Predicted in {predictTime} seconds.")
-            print("PRED: ", prediction[0])
+            print("Top 3 predictions: ", prediction[0])
             predictions.append(prediction[0])
     
     queue.put(faces)
@@ -86,15 +88,15 @@ if __name__ == "__main__":
 
     font = cv2.FONT_HERSHEY_SIMPLEX
     model = ReadyModel('generalizedSVM')
-    segmentor = Segmentor('Haar')
+    segmentor = Segmentor('Yolo')
     BUFF = 15
 
-    IMG_PROCESS_TIME = 0.5
+    IMG_PROCESS_TIME = 2.5  # YOLO segmentation and Generalized SVM computation time determined by testing
     thread = None
     faces = []
     resultsQueue = Queue()
 
-    video_capture = cv2.VideoCapture(0) # Begin capturing video from camera
+    video_capture = cv2.VideoCapture(0) # Capture video from default camera
 
     lastImageProcess = time.time()
     while True:
