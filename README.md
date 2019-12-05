@@ -58,7 +58,7 @@ The live video demo can be run using the following command:
 
 Expected behavior: the script receives a video feed from the machine's default camera, finds and classifies the faces
 in the video as attentive or inattentive, marks the faces with boundary boxes and different colors based on the
-classification, and displays the processed video.
+classification, and displays the processed video. <b> Note: in order to run you might need pre-trained weights that are too big to store on this repo. Look at the `SegmentorClass.py` section for more info <b>
 
 ## Modules
 
@@ -151,4 +151,4 @@ In the figure below, the left 3 columns demonstrate the best SVM predictions and
 
  Contains driver code for each of the three models we used. Each model has a specific `init` function and `segment`
  function to return the bounding box coordinates along with an array of the resized faces to feed into the emotional classification models.
- The model functions are predetermined when initializing the `Segmentor` class where it takes in the parameter of `impl` which you can define to be one of the three models "Haar", "Yolo", or "faced". You can then use the `Segmentor` instance to call the `segment(frame)` method which takes in a numpy array representing the image to be processed.
+ The model functions are predetermined when initializing the `Segmentor` class where it takes in the parameter of `impl` which you can define to be one of the three models "Haar", "Yolo", or "faced". You can then use the `Segmentor` instance to call the `segment(frame)` method which takes in a numpy array representing the image to be processed. <b> Note for 'Yolo' you will need pre-trained weights and config files `yolov3-face.cfg` and `yolov3-wider_16000.weights` which you can find in this Google Drive link along with other weight files: https://drive.google.com/drive/folders/1oj9p04mPjbbCbq1qSK8ChMjOhMLMpk42 <b>
